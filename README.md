@@ -113,11 +113,11 @@ flowchart TD
         EQ["Equivalence\nQueries"]
     end
 
-    SUT["⚙️ System Under Test\nvalidation & telemetry"]
+    SUT["System Under Test\nvalidation & telemetry"]
 
-    TOPO["✅ Verified State\nTopology"]
-    MARKOV["📊 Calibrated\nMarkov Model"]
-    TESTS["🧪 Executable\nTest Suites"]
+    TOPO["Verified State\nTopology"]
+    MARKOV["Calibrated\nMarkov Model"]
+    TESTS["Executable\nTest Suites"]
 
     NL --> NPM
     NPM --> MQ
