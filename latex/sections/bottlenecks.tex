@@ -39,12 +39,12 @@ A valid Markov chain usage model must satisfy strict mathematical constraints~\c
 and every row must sum to exactly one:
 \begin{equation}
     \sum_{j} p_{ij} = 1, \quad \forall\, i.
-    \label{eq:row_stochastic}
+    \label{eq:row_stochastic_intro}
 \end{equation}
 
 Furthermore, real-world operational profiles include complex, multi-variable constraints~\cite{boehr_constraints}. These may involve defining one transition probability as a function of another, or constraining the expected overall sequence length to a specific numerical range. Such constraints transform the calibration task into a convex optimization problem over the probability simplex.
 
-LLMs struggle with precise numerical reasoning and constraint satisfaction~\cite{llm_numerical_reasoning}. If tasked with generating these probabilities directly, an LLM cannot guarantee that the resulting matrix satisfies the linear and convex constraints imposed by Equations~\eqref{eq:prob_bounds} and~\eqref{eq:row_stochastic}. This numerical inaccuracy makes it difficult to reliably compute steady-state occupancy rates or use the model as an unbiased source of random walks for statistical testing~\cite{markov_reliability}.
+LLMs struggle with precise numerical reasoning and constraint satisfaction~\cite{llm_numerical_reasoning}. If tasked with generating these probabilities directly, an LLM cannot guarantee that the resulting matrix satisfies the linear and convex constraints imposed by Equations~\eqref{eq:prob_bounds} and~\eqref{eq:row_stochastic_intro}. This numerical inaccuracy makes it difficult to reliably compute steady-state occupancy rates or use the model as an unbiased source of random walks for statistical testing~\cite{markov_reliability}.
 
 % ------------------------------------------------------------------------------
 % Subsection C: State-Space Explosion and Modeless Concurrency Vulnerabilities

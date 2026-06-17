@@ -58,7 +58,7 @@ To resolve the limitations identified in the preceding analysis, this paper intr
 \node[oracle, right=2.2cm of ale] (oracle) {Grammar-Constrained\\LLM Oracle\\{\scriptsize Output: \{Yes, No, Unsure\}}};
 
 % --- SUT ---
-\node[sut, below=1.6cm of oracle] (sut) {SUT Execution \&\\Validation\\{\scriptsize Returns counterexamples}};
+\node[sut, below=1.6cm of oracle] (sut) {SUT Execution\\Validation\\{\scriptsize Returns counterexamples}};
 
 % --- Verified state topology ---
 \node[topology, below=1.6cm of ale] (topo) {Verified State\\Topology};
@@ -74,13 +74,13 @@ To resolve the limitations identified in the preceding analysis, this paper intr
 \draw[arr] (ale.east) -- node[above, font=\scriptsize, text width=1.8cm, align=center] {membership\\queries} (oracle.west);
 
 % ALE -> SUT (equivalence queries)
-\draw[arr] (ale.south east) -- node[right, font=\scriptsize, text width=1.8cm, align=center, pos=0.4] {equivalence\\queries} (SUT\@.north west);
+\draw[arr] (ale.south east) -- node[right, font=\scriptsize, text width=1.8cm, align=center, pos=0.4] {equivalence\\queries} (sut.north west);
 
 % Oracle -> Topo
 \draw[arr] (oracle.south west) -- node[left, font=\scriptsize, pos=0.4] {responses} (topo.north east);
 
 % SUT -> Topo (counterexamples)
-\draw[arr] (SUT\@.west) -- node[above, font=\scriptsize] {counterexamples} (topo.east);
+\draw[arr] (sut.west) -- node[above, font=\scriptsize] {counterexamples} (topo.east);
 
 % Topo -> Solver
 \draw[arr] (topo.south) -- node[right, font=\scriptsize] {state graph} (solver.north);
