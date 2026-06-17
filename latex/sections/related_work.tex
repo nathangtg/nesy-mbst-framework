@@ -1,0 +1,233 @@
+% ==============================================================================
+% Section II: State of the Art
+% ==============================================================================
+\section{State of the Art}
+\label{sec:related_work}
+
+To contextually locate the integration of Large Language Models (LLMs)
+within the domain of model-based software testing, it is necessary to
+examine the existing landscape of MBT and MBST toolsets. Over several
+decades, academic and commercial entities have developed specialized
+testing engines designed to consume structured inputs and generate test
+suites based on distinct coverage criteria~\cite{taxonomy_mbt,
+mbt_tools_approach}. Table~\ref{tab:mbt_tools} summarises the most
+prominent tools with respect to their input formalisms, generation
+strategies, and target domains.
+
+% ---------- Table I: MBT / MBST Tool Landscape ----------
+\begin{table*}[!t]
+\centering
+\caption{Comparison of Established Model-Based Testing Tools}
+\label{tab:mbt_tools}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{2.0cm} p{3.8cm} p{4.8cm} p{4.8cm}}
+\hline\hline
+\textbf{Tool} &
+\textbf{Primary Input Format} &
+\textbf{Test Generation Strategy \& Heuristics} &
+\textbf{Target Domain \& Supported Outputs} \\
+\hline
+MaTeLo &
+Markov chains, annotated sequence diagrams &
+Profile-oriented random generation, transition coverage &
+Functional test generation, TTCN-3, commercial systems \\
+\hline
+JUMBL &
+Custom Test Model Language (TML) &
+Automated constraint-driven probability generation &
+Java command-line suite for statistical usage metrics \\
+\hline
+fMBT &
+AAL pre/postcondition language &
+Random, weighted random, and lookahead heuristics &
+Open-source API and system testing with Python adapters \\
+\hline
+GraphWalker &
+Finite State Machines (FSM) &
+A* search, random walks with state/edge limits &
+Open-source state machine path execution \\
+\hline
+Modbat &
+Scala-based Domain-Specific Language (DSL) &
+Probabilistic and non-deterministic transitions &
+Specialised API testing, exception-handling verification \\
+\hline
+MoMuT::UML &
+UML State Machines, Object-Oriented Action Systems &
+Mutation-based, fault-driven test case generation &
+Academic safety-critical and contract-based systems \\
+\hline
+BPM-X &
+BPMN, UML business process models &
+Statement, branch, path, and condition criteria &
+Enterprise business process verification, ALM exports \\
+\hline
+Conformiq &
+UML State Machines, QML, Activity Diagrams &
+Combinatorial, constraint-driven test case generation &
+Enterprise automated testing, test management platforms \\
+\hline
+4Test &
+Gherkin-inspired custom syntax &
+Constraint-driven combinatorial scenario selection &
+Commercial interface and functional testing \\
+\hline\hline
+\end{tabular}
+\end{table*}
+
+A common thread across the tools listed in Table~\ref{tab:mbt_tools} is
+their reliance on handcrafted, domain-specific input artefacts---Markov
+chains~\cite{prowell_markov}, custom DSLs~\cite{jumbl_mbst_tutorial},
+AAL annotations~\cite{boehr_constraints}, or full UML state
+machines~\cite{mbt_overview_bme}. Constructing and maintaining these
+artefacts remains the principal bottleneck for wider industrial
+adoption~\cite{taxonomy_mbt}. It is precisely this bottleneck that
+motivates the exploration of LLMs as a means to automate or partially
+automate the generation of behavioural models from less formal sources.
+
+% ---------- 2.1 Foundation Models for Formal Process Automation ----------
+\subsection{Foundation Models for Formal Process Automation}
+\label{sec:rw_foundation_models}
+
+The advent of large-scale foundation models has opened new avenues for
+automating tasks that were historically performed manually by domain
+experts. Within protocol engineering, \emph{ProtocolGPT}~\cite{protocol_gpt}
+demonstrated that Retrieval-Augmented Generation (RAG) can be used to
+infer protocol state machines directly from RFC documents, achieving a
+precision exceeding 90\% on well-structured specifications. By indexing
+protocol documentation into a vector store and prompting the model with
+targeted queries, ProtocolGPT effectively bridges the gap between
+unstructured natural-language specifications and formal finite-state
+representations.
+
+Complementing this line of work, the \emph{ChatFuMe}
+framework~\cite{chatfume} introduces an active-feedback parsing loop in
+which the LLM iteratively refines its interpretation of protocol
+documentation. Rather than relying on a single-pass generation,
+ChatFuMe solicits structured clarifications and re-queries the model
+until convergence, yielding more robust and consistent state-machine
+extractions.
+
+Beyond textual inputs, recent advances in multimodal LLMs have enabled
+the interpretation of \emph{visual} specifications---hand-drawn
+diagrams, whiteboard sketches, and scanned documents---into structured
+UML artefacts~\cite{uml_benchmarking}. These capabilities suggest that
+the input barrier for model-based testing could be further lowered by
+accepting informal, heterogeneous documentation as a starting point for
+model construction.
+
+% ---------- 2.2 GUI Exploration and Visual Understanding ----------
+\subsection{GUI Exploration and Visual Understanding}
+\label{sec:rw_gui}
+
+A parallel body of work applies LLMs to the exploration of graphical
+user interfaces, a task closely related to state-machine inference at
+the interaction level. \emph{VisionDroid}~\cite{visiondroid} employs
+vision-language models to navigate mobile application screens and
+automatically derive behavioural paths, while \emph{LLMShot} extends
+this paradigm to few-shot GUI exploration with minimal human-provided
+demonstrations. On the commercial side, Eggplant Functional's
+\emph{Find By Description} engine~\cite{eggplant_ai} leverages natural
+language to locate and interact with on-screen elements, effectively
+enabling AI-driven exploratory testing without explicit object
+repositories. These systems illustrate the growing convergence between
+visual understanding, natural-language processing, and automated test
+generation.
+
+% ---------- TikZ Figure: LLM Pipeline ----------
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[
+    node distance=1.6cm and 1.0cm,
+    >=latex,
+    every node/.style={font=\small},
+    box/.style={draw, rounded corners=3pt, minimum height=0.9cm,
+                minimum width=3.0cm, align=center, fill=white},
+    llmbox/.style={draw, rounded corners=3pt, minimum height=3.4cm,
+                   minimum width=5.6cm, align=center,
+                   fill=gray!8, inner sep=8pt},
+    resultbox/.style={draw, rounded corners=2pt, minimum height=0.7cm,
+                      minimum width=4.8cm, align=center, fill=white,
+                      font=\footnotesize},
+]
+
+% --- Input ---
+\node[box, fill=blue!10] (prompt) {Natural Language\\Prompt};
+
+% --- LLM container ---
+\node[llmbox, right=1.8cm of prompt] (llm) {};
+\node[anchor=north, font=\small\bfseries] at ([yshift=-4pt]llm.north)
+    {Large Language Model};
+
+% --- Two internal result boxes ---
+\node[resultbox, fill=green!8] (single)
+    at ([yshift=-2pt]llm.center |- {$(llm.north)!0.42!(llm.south)$})
+    {Single-Prompt Baseline\\
+     $F_1^{\mathrm{States}} \approx 0.80$\,,\;
+     $F_1^{\mathrm{Trans}} \approx 0.75$};
+
+\node[resultbox, fill=orange!10] (multi)
+    at ([yshift=2pt]llm.center |- {$(llm.north)!0.75!(llm.south)$})
+    {Multi-Step / Hybrid Framework\\
+     $F_1^{\mathrm{States}} \approx 0.85$\,,\;
+     $F_1^{\mathrm{Trans}} \approx 0.65$};
+
+% --- Arrow ---
+\draw[->, thick] (prompt.east) -- (llm.west);
+
+\end{tikzpicture}
+\caption{High-level LLM pipeline for state-machine extraction,
+contrasting single-prompt and multi-step generation strategies with
+representative $F_1$ scores for state and transition identification.}
+\label{fig:llm_pipeline}
+\end{figure}
+
+% ---------- 2.3 Frameworks for LLM-Driven State Machine Generation --------
+\subsection{Frameworks for LLM-Driven State Machine Generation}
+\label{sec:rw_frameworks}
+
+Existing approaches to LLM-driven state-machine generation can be
+broadly categorised into three paradigms, as illustrated in
+Fig.~\ref{fig:llm_pipeline}.
+
+\subsubsection{Structure-Driven Frameworks}
+Structure-driven methods impose an explicit schema or template on the
+LLM's output. The model is instructed to populate predefined fields
+(e.g., a JSON schema enumerating states, transitions, guards, and
+actions), and the resulting artefact is validated against the schema
+before downstream consumption~\cite{llm_state_machine_frameworks}. This
+strategy favours \emph{syntactic correctness} and enables deterministic
+post-processing, but may constrain the model's ability to capture
+nuanced behavioural semantics that fall outside the template.
+
+\subsubsection{Event-Driven Frameworks}
+Event-driven approaches frame state-machine extraction as an
+event-identification task: the LLM first enumerates the events or stimuli
+described in the specification, and subsequently derives the states and
+transitions that arise from those events~\cite{boundary_value_llm}. By
+anchoring the generation process in observable events, these frameworks
+align naturally with usage-model methodologies~\cite{usage_model_web,
+nap_statistics} and can leverage the LLM's strength in entity extraction.
+
+\subsubsection{Hybrid Approaches}
+Hybrid strategies combine the immediacy of single-prompt generation with
+structured, step-by-step refinement. A typical pipeline issues an
+initial broad prompt to obtain a draft state machine, then applies a
+sequence of targeted follow-up prompts---e.g., ``identify missing guard
+conditions'' or ``merge equivalent states''---to iteratively improve the
+model~\cite{llm_state_machine_frameworks}. As shown in
+Fig.~\ref{fig:llm_pipeline}, hybrid approaches tend to achieve higher
+$F_1$ scores for state identification (${\approx}\,0.85$) compared with
+single-prompt baselines (${\approx}\,0.80$), albeit with a trade-off in
+transition accuracy ($F_1^{\mathrm{Trans}} \approx 0.65$ vs.\
+${\approx}\,0.75$), likely due to the compounding of intermediate
+extraction errors across multiple inference steps.
+
+\medskip
+Collectively, these related works establish that LLMs possess a
+demonstrable capacity to parse semi-structured and unstructured
+specifications into formal behavioural models. However, a comprehensive,
+end-to-end evaluation that benchmarks multiple prompting strategies
+against an established MBST toolchain---and that measures not only model
+fidelity but also downstream test-suite quality---remains an open gap in
+the literature. The present study addresses this gap directly.

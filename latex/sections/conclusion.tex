@@ -1,0 +1,147 @@
+% !TEX root = ../main.tex
+
+\section{Strategic Outlook and Recommendations}%
+\label{sec:conclusion}
+
+The integration of Large Language Models within Model-Based Statistical
+Testing represents a significant evolutionary step in software
+certification and validation.  By replacing manual model-building
+processes with grammar-constrained active learning and neuro-symbolic
+deduction, the NeSy-MBST framework makes rigorous statistical testing
+viable for modern, agile software development lifecycles~\cite{neurostrata,taxonomy_mbt}.
+
+\subsection{System-Under-Test Reference Architecture}
+
+To ground the preceding discussion in a concrete deployment context,
+Fig.~\ref{fig:sut_architecture} illustrates a representative
+System-Under-Test (SUT) architecture for an autonomous
+Cyber-Physical System (CPS).  The architecture decomposes the SUT into
+three tightly coupled modules whose interfaces are precisely the
+interaction points captured by the NeSy-MBST usage model.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[
+    >=latex,
+    node distance=0.6cm and 1.4cm,
+    module/.style={
+        rectangle, draw, thick, rounded corners=3pt,
+        minimum width=5.8cm, minimum height=1.6cm,
+        fill=#1!8, draw=#1!70!black,
+        font=\small
+    },
+    sublabel/.style={
+        font=\scriptsize\itshape, text width=5.2cm, align=center
+    },
+    flow/.style={
+        ->, thick, draw=black!70
+    },
+    flowlabel/.style={
+        font=\scriptsize, midway, right=2pt
+    },
+    sutbox/.style={
+        rectangle, draw=black!60, dashed, thick,
+        rounded corners=5pt, inner sep=10pt
+    }
+]
+
+% Modules (stacked vertically) 
+\node[module=blue] (percep)
+    {\textbf{Perception Module}};
+\node[sublabel, below=0pt of percep.south]  (percep_desc)
+    {Processes sensor data (LiDAR, cameras);\\matches semantic graph};
+
+\node[module=orange, below=1.6cm of percep] (plan)
+    {\textbf{Planning Module} {\scriptsize(Local / Global)}};
+\node[sublabel, below=0pt of plan.south] (plan_desc)
+    {Computes safe trajectories under\\physical motion invariants};
+
+\node[module=red, below=1.6cm of plan] (act)
+    {\textbf{Actuation Module}};
+\node[sublabel, below=0pt of act.south] (act_desc)
+    {Executes physical steering /\\throttle controls};
+
+% — Data-flow arrows —
+\draw[flow] (percep.south) -- node[flowlabel] {coordinates} (plan.north);
+\draw[flow] (plan.south)   -- node[flowlabel] {commands}    (act.north);
+
+% — SUT bounding box —
+\node[sutbox,
+      fit=(percep)(percep_desc)(plan)(plan_desc)(act)(act_desc),
+      label={[font=\small\bfseries, anchor=south]above:System Under Test (SUT)}
+     ] {};
+
+\end{tikzpicture}
+\caption{Reference architecture for an autonomous CPS
+System-Under-Test.  The three modules—Perception, Planning, and
+Actuation—correspond to distinct abstraction tiers whose interfaces
+are modelled as states and transitions in the NeSy-MBST usage model.}%
+\label{fig:sut_architecture}
+\end{figure}
+
+As systems of this kind become increasingly complex, the neuro-symbolic
+approach is particularly valuable for verifying safety-critical,
+autonomous, and learning-enabled CPS such as autonomous vehicles and
+unmanned aerial vehicles (UAVs)~\cite{cps_foundation_models}.
+
+\subsection{Actionable Recommendations}
+
+Drawing on the empirical and theoretical results presented in the
+preceding sections, we distil four actionable recommendations for
+practitioners and researchers seeking to adopt neuro-symbolic MBST
+pipelines.
+
+\begin{enumerate}
+    \item \textbf{Establish Automated Specification Mining.}
+    Natural-language requirements documents should be processed through
+    grammar-constrained LLM oracles to extract candidate states,
+    transitions, and guards automatically.  Coupling extraction with
+    formal schema validation (e.g., EBNF grammars) prevents
+    hallucinated artefacts from propagating into downstream
+    models~\cite{chatfume,formalising_requirements}.
+
+    \item \textbf{Enforce Hybrid Active Learning Pipelines.}
+    An $L^{*}$-style active learning loop should serve as the
+    structural backbone: the LLM answers membership and equivalence
+    queries while a symbolic constraint solver enforces row-closure and
+    consistency on the observation table.  This division of labour
+    exploits the linguistic fluency of LLMs without sacrificing the
+    mathematical guarantees of automata
+    learning~\cite{llm_state_machine_frameworks,boehr_constraints}.
+
+    \item \textbf{Implement Hierarchical Multi-Tier Models.}
+    Complex SUT architectures (cf.\ Fig.~\ref{fig:sut_architecture})
+    benefit from hierarchical Markov chain usage models: a high-level
+    chain captures inter-module interactions while subordinate chains
+    model intra-module behaviour.  Hierarchical decomposition reduces
+    state-space explosion and improves the tractability of statistical
+    certification~\cite{usage_model_web,taxonomy_mbt}.
+
+    \item \textbf{Deploy Telemetry-Driven Closed-Loop Validation.}
+    Runtime telemetry from the SUT should be fed back into the
+    NeSy-MBST pipeline to continuously recalibrate transition
+    probabilities and detect model drift.  A closed-loop architecture
+    ensures that the usage model remains aligned with the evolving
+    operational profile throughout the software
+    lifecycle~\cite{neurostrata,cps_foundation_models}.
+\end{enumerate}
+
+\subsection{Concluding Remarks}
+
+This paper has demonstrated that the NeSy-MBST framework—combining
+active automata learning, grammar-constrained LLM oracles, symbolic
+constraint solvers, and closed-loop telemetry feedback—addresses the
+long-standing bottleneck of manual usage-model construction in
+Model-Based Statistical Testing.  By enforcing structural coherence
+through the $L^{*}$ algorithm, mathematical calibration through
+symbolic probability solvers, and empirical fidelity through
+telemetry-driven recalibration, the framework ensures that testing
+pipelines remain \emph{structurally coherent},
+\emph{mathematically calibrated}, and \emph{capable of certifying
+system reliability} at the rigour demanded by safety-critical
+domains~\cite{neurostrata,taxonomy_mbt}.
+
+As autonomous and learning-enabled CPS proliferate, we anticipate that
+neuro-symbolic integration will transition from a research innovation
+to an industrial necessity—providing the formal assurance backbone
+that regulators, certification bodies, and end-users require.

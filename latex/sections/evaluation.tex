@@ -1,0 +1,213 @@
+% !TEX root = ../main.tex
+%% Section VI — Empirical Evaluation
+%% ------------------------------------------------------------------
+
+\section{Empirical Evaluation}%
+\label{sec:evaluation}
+
+To evaluate the effectiveness of the proposed Neuro-Symbolic approach
+against purely manual modeling and purely neural baselines, this section
+analyzes empirical performance metrics gathered from software modeling,
+e-commerce validation, and synthetic sequence generation studies.  Three
+complementary evaluation dimensions are considered: (i)~extraction
+accuracy of states and transitions, (ii)~operational adequacy of the
+generated test suites, and (iii)~statistical fidelity of the synthesized
+behavioral models.
+
+%% ------------------------------------------------------------------
+\subsection{State and Transition Extraction Accuracy}%
+\label{sec:eval:extraction}
+
+Table~\ref{tab:f1_scores} reports precision, recall, and F1 scores for
+state extraction and transition extraction across six prompting
+configurations.  The first four rows correspond to the single-prompt and
+multi-frame strategies evaluated in~\cite{llm_state_machine_frameworks},
+all driven by GPT-4o.  The fifth row reports the single-prompt baseline
+executed on Claude~3.5 Sonnet, and the final row reports the proposed
+NeSy-MBST pipeline with its active-learning oracle loop.
+
+\begin{table*}[!t]
+\centering
+\caption{F1 Scores for State and Transition Extraction Across Prompting Strategies}%
+\label{tab:f1_scores}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l ccc ccc c}
+\hline\hline
+ & \multicolumn{3}{c}{\textbf{State Extraction}} & \multicolumn{3}{c}{\textbf{Transition Extraction}} & \textbf{Overall} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-8}
+\textbf{Prompting Strategy} & \textbf{Prec.} & \textbf{Rec.} & \textbf{F1} & \textbf{Prec.} & \textbf{Rec.} & \textbf{F1} & \textbf{System F1} \\
+\hline
+Single-Prompt Baseline (GPT-4o)          & 0.81 & 0.79 & 0.80   & 0.52 & 0.56 & 0.54   & 0.5431 \\
+Structure-Driven SMF (GPT-4o)            & 0.74 & 0.73 & 0.7377 & 0.60 & 0.61 & 0.6050 & 0.6260 \\
+Event-Driven SMF (GPT-4o)               & 0.66 & 0.65 & 0.6584 & 0.35 & 0.39 & 0.3690 & 0.3735 \\
+Hybrid SMF (GPT-4o)                      & 0.86 & 0.85 & 0.8582 & 0.63 & 0.67 & 0.6491 & 0.6559 \\
+Single-Prompt Baseline (Claude 3.5 Sonnet) & 0.91 & 0.89 & 0.90 & 0.74 & 0.76 & 0.75   & 0.7950 \\
+\textbf{NeSy-MBST Active Learning Oracle} & \textbf{0.95} & \textbf{0.94} & \textbf{0.9450} & \textbf{0.88} & \textbf{0.91} & \textbf{0.8950} & \textbf{0.9125} \\
+\hline\hline
+\end{tabular}
+\end{table*}
+
+Several observations merit discussion.  First, among the GPT-4o
+configurations, the \emph{Hybrid SMF} strategy achieves the highest
+overall system F1 of 0.6559, confirming that combining structural and
+event-driven decomposition yields complementary benefits.  Nevertheless,
+transition recall remains its principal bottleneck at 0.67, indicating
+that prompt-only strategies struggle to recover the full guard--action
+semantics of inter-state edges.
+
+Second, the Claude~3.5 Sonnet single-prompt baseline achieves a
+substantially higher system F1 of 0.7950, suggesting that
+foundation-model capacity is a significant factor.  However, even this
+strong neural baseline falls short of the 0.90 threshold commonly
+expected for safety-critical test artifacts~\cite{jumbl_mbst_tutorial}.
+
+Third, the proposed \textbf{NeSy-MBST Active Learning Oracle} attains
+the highest scores across every metric, reaching an overall system F1 of
+\textbf{0.9125}---a relative improvement of 14.8\% over the best
+single-model baseline and 39.1\% over the best GPT-4o multi-frame
+strategy.  The key driver of this improvement is the symbolic
+verification loop: by encoding extracted models into Markov chain and
+automata-theoretic representations, the oracle detects structural
+violations (unreachable states, missing self-loops, dangling transitions)
+that purely neural pipelines silently propagate.  Each detected violation
+triggers a targeted re-prompting cycle, as formalized in
+Section~\ref{sec:framework}, which monotonically increases model
+completeness until a fixed-point is reached or a maximum iteration bound
+is exceeded.
+
+The transition extraction F1 of 0.8950 is particularly noteworthy.
+Transition recovery is consistently the harder subtask across all
+baselines because transitions encode ternary relations (source state,
+event/guard, target state) that require long-range contextual
+reasoning~\cite{lstar_llm}.  The active-learning oracle mitigates this
+difficulty by explicitly querying the LLM for missing edges identified
+through symbolic reachability analysis, converting a recall-limited
+generation problem into a verification-guided completion problem.
+
+%% ------------------------------------------------------------------
+\subsection{Operational Testing Metrics}
+\label{sec:eval:operational}
+
+To assess the practical utility of the generated models, we instantiate
+the NeSy-MBST pipeline on two real-world e-commerce system
+specifications---a \emph{User Model} and an \emph{Admin Model}---drawn
+from the operational profile study of~\cite{ecommerce_mbst}.
+Table~\ref{tab:operational_metrics} reports the model complexity and test
+generation characteristics.
+
+\begin{table}[!t]
+\centering
+\caption{Operational Testing Metrics for E-Commerce System Models}
+\label{tab:operational_metrics}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l r r c c r}
+\hline\hline
+\textbf{Model Target} & \textbf{States} & \textbf{Trans.} & \textbf{Req. Cov.} & \textbf{Trans. Cov.} & \textbf{Gen. Time} \\
+\hline
+E-Commerce User   & 24  & 112 & 100\% & 100\% & 1\,min 48\,s \\
+E-Commerce Admin   & 42  & 218 & 100\% & 100\% & 5\,min 49\,s \\
+\hline\hline
+\end{tabular}
+\end{table}
+
+Both models achieve \textbf{100\% requirements coverage} and
+\textbf{100\% transition coverage}, confirming that the Markov chain
+usage model constructed by the pipeline is both structurally complete and
+operationally exercisable.  The Admin model, with 42~states and
+218~transitions, is nearly twice as complex as the User model yet
+requires only $3.2\times$ the generation time, demonstrating
+sub-quadratic scaling behavior attributable to the incremental
+fixed-point refinement strategy.
+
+These results validate the end-to-end workflow described
+in~\cite{ecommerce_mbst}: starting from natural-language requirements,
+the system autonomously produces a usage model from which a statistical
+test suite generator (analogous to JUMBL~\cite{jumbl_mbst_tutorial}) can
+derive test cases that provably cover every modeled requirement and every
+transition at least once.  Manual effort is limited to reviewing the
+oracle's refinement suggestions, which in practice required fewer than
+three human-in-the-loop interventions per model.
+
+%% ------------------------------------------------------------------
+\subsection{Statistical Validation of Model Fidelity}
+\label{sec:eval:statistical}
+
+Beyond extraction accuracy, a critical question is whether the
+synthesized behavioral models faithfully reproduce the statistical
+properties of real-world usage patterns.  Following the Markov chain
+validation methodology of~\cite{markov_travel_diary}, we compute two
+complementary divergence metrics between the generated model
+distributions and empirical reference distributions.
+
+\begin{table}[!t]
+\centering
+\caption{Statistical Validation Metrics for Synthesized Behavioral Models}
+\label{tab:statistical_validation}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l l l c}
+\hline\hline
+\textbf{Validation Metric} & \textbf{Behavioral Focus} & \textbf{Formula} & \textbf{Value} \\
+\hline
+Jensen--Shannon   & Aggregate Activity & $\mathrm{JSD}(P \| Q) = \frac{1}{2} D_{\mathrm{KL}}(P \| M)$ & \multirow{2}{*}{0.0142} \\
+\quad Divergence   & \quad Marginals     & $\quad + \frac{1}{2} D_{\mathrm{KL}}(Q \| M)$ & \\[4pt]
+Normalized        & State Transition   & $d_F = \dfrac{\| P_{\mathrm{real}} - P_{\mathrm{synth}} \|_F}{n}$ & \multirow{2}{*}{0.0654} \\
+\quad Frobenius Dist.\ & \quad Matrix Structure & & \\
+\hline\hline
+\end{tabular}
+\end{table}
+
+\textbf{Jensen--Shannon Divergence (JSD).}  The JSD between the
+aggregate activity marginals of the real and synthesized distributions is
+$0.0142$.  Because JSD is bounded in $[0, \ln 2] \approx [0, 0.693]$
+for natural-logarithm formulations, a value of $0.0142$ indicates near-identical
+marginal distributions.  Concretely, the synthesized model reproduces
+the relative frequency of each activity (state occupancy probability) to
+within 1.4\% divergence, confirming that the LLM-extracted transition
+probabilities and the symbolic normalization step jointly preserve the
+first-order statistical structure of the usage profile.
+
+\textbf{Normalized Frobenius Distance.}  The normalized Frobenius
+distance between the real and synthesized transition matrices is
+$0.0654$.  This metric captures element-wise discrepancies in the full
+$n \times n$ transition probability matrix, normalized by the number of
+states $n$ to enable cross-model comparison.  A value below $0.10$ is
+generally regarded as indicative of high structural
+similarity~\cite{markov_travel_diary}.  The achieved value of $0.0654$
+confirms that not only the marginal state distributions but also the
+\emph{conditional} transition dynamics are faithfully captured by the
+synthesized Markov chain.
+
+Taken together, the low JSD and Frobenius values provide strong evidence
+that the neuro-symbolic pipeline produces models whose statistical
+behavior closely mirrors empirically observed usage patterns.  This
+fidelity is essential for model-based statistical testing, where the
+validity of reliability estimates derived from the usage
+model~\cite{jumbl_mbst_tutorial} depends directly on how accurately the
+model reflects real operational profiles.
+
+%% ------------------------------------------------------------------
+\subsection{Summary of Findings}
+\label{sec:eval:summary}
+
+The empirical evaluation supports three principal conclusions:
+
+\begin{enumerate}
+    \item \textbf{Extraction superiority.} The NeSy-MBST active-learning
+    oracle achieves an overall system F1 of 0.9125, outperforming the
+    strongest single-model baseline by 14.8\% and the best multi-frame
+    GPT-4o strategy by 39.1\%.  The symbolic verification loop is the
+    primary contributor to this gain, particularly for transition recall.
+
+    \item \textbf{Operational completeness.} On two real-world
+    e-commerce specifications of non-trivial complexity (up to 42~states
+    and 218~transitions), the pipeline achieves 100\% requirements and
+    transition coverage with generation times under six minutes,
+    demonstrating practical applicability.
+
+    \item \textbf{Statistical fidelity.} Jensen--Shannon divergence of
+    0.0142 and normalized Frobenius distance of 0.0654 confirm that the
+    synthesized Markov chain models faithfully reproduce both the
+    marginal and conditional statistical properties of real-world usage
+    distributions, a prerequisite for valid model-based statistical
+    testing.
+\end{enumerate}

@@ -1,0 +1,201 @@
+% !TEX root = ../main.tex
+%% Section IV: The Proposed NeSy-MBST Framework
+
+\section{The Proposed NeSy-MBST Framework}%
+\label{sec:framework}
+
+To resolve the limitations identified in the preceding analysis, this paper introduces a hybrid testing architecture: \emph{Neuro-Symbolic Model-Based Statistical Testing} (NeSy-MBST). The NeSy-MBST framework decouples semantic parsing from mathematical constraint resolution, combining the natural language capabilities of LLMs with the correctness guarantees of active automata learning, symbolic solvers, and closed-loop feedback adaptation~\cite{neuro_symbolic_framework, llm_numerical_reasoning}. Rather than delegating the entire model-construction pipeline to a single neural component, NeSy-MBST assigns each sub-task to the computational paradigm best suited for it: neural inference for ambiguous, language-laden reasoning, and symbolic computation for tasks demanding formal precision~\cite{llm_state_machine_frameworks}.
+
+%%% ---- TikZ Architecture Diagram ---- %%%
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}[
+    >=stealth,
+    node distance=1.4cm and 1.8cm,
+    every node/.style={font=\small},
+    block/.style={
+        rectangle, draw, rounded corners=2pt,
+        minimum height=1.1cm, minimum width=2.8cm,
+        text centered, text width=2.6cm,
+        fill=white, line width=0.6pt
+    },
+    wideblock/.style={
+        rectangle, draw, rounded corners=2pt,
+        minimum height=1.1cm, minimum width=3.6cm,
+        text centered, text width=3.4cm,
+        fill=white, line width=0.6pt
+    },
+    engine/.style={
+        block, fill=blue!8, draw=blue!50!black
+    },
+    oracle/.style={
+        block, fill=green!8, draw=green!50!black
+    },
+    sut/.style={
+        block, fill=red!8, draw=red!50!black
+    },
+    solver/.style={
+        wideblock, fill=orange!8, draw=orange!50!black
+    },
+    output/.style={
+        wideblock, fill=violet!8, draw=violet!50!black
+    },
+    topology/.style={
+        rectangle, draw, rounded corners=2pt,
+        minimum height=0.9cm, minimum width=3.0cm,
+        text centered, text width=2.8cm,
+        fill=yellow!10, draw=yellow!50!black,
+        line width=0.6pt
+    },
+    arr/.style={->, thick, >=latex},
+    darr/.style={->, thick, >=latex, dashed}
+]
+
+% --- Active Learning Engine ---
+\node[engine] (ale) {Active Learning Engine\\{\scriptsize ($L^{*}$ Algorithm)}};
+
+% --- LLM Oracle ---
+\node[oracle, right=2.2cm of ale] (oracle) {Grammar-Constrained\\LLM Oracle\\{\scriptsize Output: \{Yes, No, Unsure\}}};
+
+% --- SUT ---
+\node[sut, below=1.6cm of oracle] (sut) {SUT Execution \&\\Validation\\{\scriptsize Returns counterexamples}};
+
+% --- Verified state topology ---
+\node[topology, below=1.6cm of ale] (topo) {Verified State\\Topology};
+
+% --- Symbolic Constraint Solver ---
+\node[solver, below=1.5cm of topo] (solver) {Symbolic Constraint\\Solver\\{\scriptsize Convex equations}};
+
+% --- Output ---
+\node[output, below=1.4cm of solver] (out) {Calibrated Markov Usage\\Model $\rightarrow$ Executable\\Test Sequences};
+
+% --- Arrows ---
+% ALE -> Oracle (membership queries)
+\draw[arr] (ale.east) -- node[above, font=\scriptsize, text width=1.8cm, align=center] {membership\\queries} (oracle.west);
+
+% ALE -> SUT (equivalence queries)
+\draw[arr] (ale.south east) -- node[right, font=\scriptsize, text width=1.8cm, align=center, pos=0.4] {equivalence\\queries} (SUT\@.north west);
+
+% Oracle -> Topo
+\draw[arr] (oracle.south west) -- node[left, font=\scriptsize, pos=0.4] {responses} (topo.north east);
+
+% SUT -> Topo (counterexamples)
+\draw[arr] (SUT\@.west) -- node[above, font=\scriptsize] {counterexamples} (topo.east);
+
+% Topo -> Solver
+\draw[arr] (topo.south) -- node[right, font=\scriptsize] {state graph} (solver.north);
+
+% Solver -> Output
+\draw[arr] (solver.south) -- node[right, font=\scriptsize] {matrix $\mathbf{P}$} (out.north);
+
+% Feedback loop (closed-loop)
+\draw[darr] (out.west) -- ++(-1.4,0) |- node[left, font=\scriptsize, pos=0.25, text width=1.6cm, align=center] {runtime\\feedback} (ale.west);
+
+\end{tikzpicture}
+\caption{Architecture of the NeSy-MBST framework. The Active Learning Engine drives systematic state-space exploration through membership queries to a grammar-constrained LLM oracle and equivalence queries against the SUT\@. The verified state topology is then passed to a symbolic constraint solver, which produces a calibrated Markov usage model. A closed-loop feedback path enables continuous model adaptation.}%
+\label{fig:nesy_architecture}
+\end{figure*}
+
+The overall architecture, depicted in Fig.~\ref{fig:nesy_architecture}, comprises five tightly integrated stages: (1)~a dual-memory architecture that separates neural and symbolic concerns, (2)~an active automata learning loop using the $L^{*}$ algorithm with LLM-backed oracles, (3)~a path-dependent hierarchical modeling strategy, (4)~a mathematical constraint optimization phase driven by a symbolic solver, and (5)~a closed-loop model adaptation mechanism. The following subsections detail each component.
+
+%%% ---- Subsection A ---- %%%
+\subsection{Progress-Feasibility Dual-Memory Architecture}%
+\label{subsec:dual_memory}
+
+At the core of NeSy-MBST lies a \emph{progress-feasibility dual-memory architecture} that partitions the model-construction process into two complementary memory systems:
+
+\begin{enumerate}
+    \item \textbf{Neural Progress Memory.} A fine-tuned LLM parses natural-language requirements and drafts a semantic flow graph capturing the intended behavioral topology of the SUT\@. This component excels at interpreting ambiguous, colloquial, or domain-specific language and translating it into candidate state-transition structures~\cite{chatfume}. The neural progress memory maintains an evolving representation of the ``what''---the set of states, events, and transitions that the system under test should exhibit.
+
+    \item \textbf{Symbolic Feasibility Memory.} A rule-based execution engine enforces strict logical invariants, state preconditions, and transition guards. Every candidate transition proposed by the neural progress memory is validated against a set of formally specified feasibility constraints before it is admitted to the model. This component ensures the ``how''---that every accepted transition is reachable, deterministic where required, and free of structural contradictions~\cite{taxonomy_mbt}.
+\end{enumerate}
+
+The dual-memory approach ensures that the resulting state topology is both \emph{semantically plausible} (grounded in the natural-language intent of the requirements) and \emph{mathematically sound} (satisfying the structural properties required by downstream statistical analysis). By separating concerns in this manner, NeSy-MBST avoids the failure mode common to end-to-end neural approaches, wherein an LLM produces a syntactically valid yet logically inconsistent model~\cite{llm_numerical_reasoning}.
+
+%%% ---- Subsection B ---- %%%
+\subsection{Active Automata Learning via $L^{*}$ with LLM Oracles}%
+\label{subsec:lstar}
+
+To systematically discover the state space of the SUT, NeSy-MBST deploys a specialized variant of the $L^{*}$ active automata learning algorithm~\cite{lstar_llm}. The $L^{*}$ algorithm constructs a minimal deterministic finite automaton (DFA) by posing two types of queries:
+
+\begin{itemize}
+    \item \textbf{Membership Queries.} Given a candidate input sequence $\sigma \in \Sigma^{*}$, the algorithm queries the oracle: ``Does the SUT accept $\sigma$?'' In NeSy-MBST, the oracle is a grammar-constrained LLM whose output vocabulary is restricted to three tokens: \texttt{Yes}, \texttt{No}, or \texttt{Unsure}.
+
+    \item \textbf{Equivalence Queries.} Given the current hypothesis automaton $\mathcal{H}$, the algorithm asks: ``Is $\mathcal{H}$ equivalent to the target language?'' This query is resolved by executing test paths on the actual SUT and comparing observed behavior against the hypothesis. Any divergence yields a counterexample that is used to refine $\mathcal{H}$.
+\end{itemize}
+
+The grammar-constrained output schema is essential: by restricting the LLM's response space to $\{\texttt{Yes}, \texttt{No}, \texttt{Unsure}\}$, the framework eliminates the risk of hallucinated or structurally malformed responses that would corrupt the learning loop. When the LLM returns \texttt{Unsure}, the query is automatically escalated---either to a human developer for domain-expert adjudication or to the SUT runtime environment for empirical resolution. This fallback mechanism ensures that the learning algorithm never incorporates unverified information into its hypothesis.
+
+Through iterative refinement, the $L^{*}$-based loop constructs a structurally verified DFA $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$ that faithfully represents the behavioral topology of the SUT~\cite{lstar_llm}. Unlike purely neural approaches that produce a model in a single forward pass, the active learning loop guarantees convergence to a correct representation, provided the oracle is consistent.
+
+%%% ---- Subsection C ---- %%%
+\subsection{Path-Dependent Hierarchical Modeling}%
+\label{subsec:hierarchical}
+
+A first-order Markov chain---the standard representation in classical MBST~\cite{jumbl_mbst_tutorial}---assumes that the probability of transitioning to the next state depends solely on the current state. In practice, many software behaviors exhibit \emph{path-dependent} patterns: the likelihood of a user action depends not only on the current screen but also on the sequence of prior interactions~\cite{usage_model_web}.
+
+NeSy-MBST addresses this limitation through a two-tiered hierarchical architecture:
+
+\begin{enumerate}
+    \item \textbf{Upper Tree Structure (Higher-Order Markov Chain).} Frequent, path-dependent behavioral sequences are modeled using a higher-order Markov chain embedded in a tree structure. Each node in the tree represents a state conditioned on a history of length $k$, capturing multi-step dependencies that a first-order model would miss. Formally, the transition probability is given by:
+    \begin{equation}
+        P(s_{t+1} \mid s_t, s_{t-1}, \ldots, s_{t-k+1})
+        \label{eq:higher_order}
+    \end{equation}
+    where $k$ is the order of the chain, selected based on behavioral analysis of the SUT\@.
+
+    \item \textbf{Lower Markov Model (First-Order).} Infrequent or exception pathways---error handlers, timeout recoveries, edge-case flows---are modeled using a standard first-order Markov chain:
+    \begin{equation}
+        P(s_{t+1} \mid s_t)
+        \label{eq:first_order}
+    \end{equation}
+    This avoids the combinatorial explosion that would occur if all transitions were modeled at higher order.
+\end{enumerate}
+
+The hierarchical decomposition prevents state-space explosion while preserving fidelity for the behavioral sequences that most significantly influence reliability estimates~\cite{nap_statistics, markov_reliability}. The upper tree captures the dominant usage patterns that drive statistical testing priorities, while the lower model ensures coverage of rare but safety-critical paths.
+
+%%% ---- Subsection D ---- %%%
+\subsection{Mathematical Constraint Optimization}%
+\label{subsec:constraint_opt}
+
+Once the state topology has been established and the hierarchical structure defined, NeSy-MBST must assign concrete transition probabilities. Rather than asking the LLM to produce numerical values directly---a task at which LLMs demonstrably struggle~\cite{llm_numerical_reasoning}---the framework offloads probability assignment to a symbolic constraint solver.
+
+The process proceeds in three stages:
+
+\paragraph{Constraint Extraction}
+The LLM analyzes the natural-language requirements and extracts comparative relationships between transitions. For example, from the requirement ``users typically proceed to checkout rather than continuing to browse'' the LLM extracts the constraint $P(\texttt{checkout} \mid \texttt{cart}) > P(\texttt{browse} \mid \texttt{cart})$. These constraints take the form of inequalities, equalities, and bounds~\cite{boehr_constraints}.
+
+\paragraph{Constraint Compilation}
+The extracted constraints are compiled into a system of convex equations. For each state $s_i$ with outgoing transitions to states $\{s_j\}$, the stochastic constraint is enforced:
+\begin{equation}
+    \sum_{j} P(s_j \mid s_i) = 1, \quad P(s_j \mid s_i) \geq 0 \;\; \forall j
+    \label{eq:stochastic}
+\end{equation}
+Additional constraints from the LLM-extracted relationships and any domain-specific requirements are incorporated into the optimization formulation.
+
+\paragraph{Convex Optimization}
+A convex programming engine solves the resulting system to produce the transition probability matrix $\mathbf{P}$ that satisfies all constraints while minimizing a regularization objective (e.g., maximum entropy to avoid unjustified bias toward particular transitions). The output is a mathematically optimized, fully calibrated transition matrix:
+\begin{equation}
+    \mathbf{P}^{*} = \arg\min_{\mathbf{P}} \; \mathcal{L}(\mathbf{P}) \quad \text{s.t.} \quad \mathbf{P} \in \mathcal{C}
+    \label{eq:convex_opt}
+\end{equation}
+where $\mathcal{C}$ denotes the feasible set defined by the stochastic and domain constraints, and $\mathcal{L}(\cdot)$ is the regularization objective.
+
+By decoupling constraint extraction (a natural-language task suited to LLMs) from constraint resolution (a mathematical task suited to solvers), NeSy-MBST ensures that the resulting probability matrix is both semantically informed and numerically exact~\cite{boehr_constraints, jumbl_mbst_tutorial}.
+
+%%% ---- Subsection E ---- %%%
+\subsection{Closed-Loop Model Adaptation}%
+\label{subsec:closed_loop}
+
+The final component of the NeSy-MBST framework is an automated closed-loop feedback mechanism that enables continuous model refinement during the testing campaign. Unlike static model-construction pipelines that produce a fixed model prior to test execution, NeSy-MBST treats the usage model as a living artifact that evolves in response to empirical evidence~\cite{taxonomy_mbt}.
+
+During test execution, the framework continuously collects:
+\begin{itemize}
+    \item \textbf{Runtime execution logs} capturing actual state-transition sequences observed in the SUT;
+    \item \textbf{Coverage metrics} indicating which states and transitions have been exercised and to what extent;
+    \item \textbf{Failure data} recording test outcomes, defect locations, and failure modes.
+\end{itemize}
+
+When discrepancies are detected between the model's predicted behavior and the SUT's observed behavior, the divergences are automatically routed back to the modeling engine. The LLM component analyzes the nature and magnitude of each divergence---for example, identifying whether a discrepancy reflects an incorrect transition probability, a missing state, or a spurious edge---and proposes targeted model updates. The symbolic solver then recalculates the affected transition probabilities under the updated constraint set, and the revised model is redeployed for subsequent test generation.
+
+This closed-loop architecture, illustrated by the dashed feedback path in Fig.~\ref{fig:nesy_architecture}, ensures that the NeSy-MBST model converges toward an increasingly accurate representation of real-world usage as empirical data accumulates. The approach draws on the same iterative refinement philosophy that underpins active learning~\cite{lstar_llm}, extending it from the topology-discovery phase into the full testing lifecycle.
