@@ -1,0 +1,11 @@
+[project]
+name = "llm-mbst-research"
+version = "0.1.0"
+description = "Neuro-Symbolic Model-Based Statistical Testing Framework"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "numpy>=2.4.6",
+    "scipy>=1.17.1"
+]
