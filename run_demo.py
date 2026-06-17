@@ -64,7 +64,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     print(f"Expected states: {len(scenario['expected_states'])}")
     print(f"Expected transitions: {len(scenario['expected_transitions'])}")
 
-    # ── Step 1: Neural Progress Memory via LLM ──────────────────────────
+    # Step 1: Neural Progress Memory via LLM 
     print("\n[1/5] Neural Progress Memory (LLM Membership Oracle)...")
 
     if use_real_llm:
@@ -89,7 +89,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     print(f"  Escalations: {oracle.escalation_count}")
     print(f"  Cache size: {len(oracle.membership_cache)}")
 
-    # ── Step 2: Extract states/transitions from requirements ────────────
+    # Step 2: Extract states/transitions from requirements
     print("\n[2/5] State & Transition Extraction...")
     extracted_states = extract_states_from_requirements(scenario["requirements"])
     extracted_transitions = extract_transitions_from_requirements(
@@ -98,7 +98,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     print(f"  Extracted states: {len(extracted_states)} / {len(scenario['expected_states'])}")
     print(f"  Extracted transitions: {len(extracted_transitions)} / {len(scenario['expected_transitions'])}")
 
-    # ── Step 3: Symbolic Feasibility Memory ─────────────────────────────
+    # Step 3: Symbolic Feasibility Memory
     print("\n[3/5] Symbolic Feasibility Memory (Validation)...")
     feasibility = SymbolicFeasibilityMemory()
     feasibility.block_transition("EmergencyBrake", "Actuating")
@@ -118,7 +118,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
         validated_transitions.update(missing)
     print(f"  After symbolic validation: {len(validated_transitions)} transitions")
 
-    # ── Step 4: Convex Optimisation (Symbolic Solver) ───────────────────
+    # Step 4: Convex Optimisation (Symbolic Solver)─
     print("\n[4/5] Convex Constraint Optimisation (Symbolic Solver)...")
     solver = ConstraintSolver(SolverConfig(max_entropy=True))
     states = sorted(scenario["expected_states"])
@@ -133,7 +133,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     pi = mc.steady_state()
     print(f"  Steady-state dist.: Idle={pi[0]:.4f}, Sensing={pi[1]:.4f}, ...")
 
-    # ── Step 5: Test Generation & Coverage ──────────────────────────────
+    # Step 5: Test Generation & Coverage
     print("\n[5/5] Statistical Test Generation & Coverage...")
     generator = StatisticalTestGenerator(mc, max_path_length=200)
     suite = generator.generate_coverage_suite(target_coverage=1.0)
@@ -142,7 +142,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     print(f"  State coverage: {stats['state_coverage']:.2%}")
     print(f"  Transition coverage: {stats['transition_coverage']:.2%}")
 
-    # ── Evaluation Metrics ──────────────────────────────────────────────
+    # Evaluation Metrics
     print("\n" + "=" * 40)
     print("EVALUATION METRICS")
     print("=" * 40)
@@ -178,7 +178,7 @@ def run_llm_demo(use_real_llm: bool = True) -> dict:
     print(f"  JSD (marginals): {jsd:.6f}")
     print(f"  Frobenius dist.: {frob:.6f}")
 
-    # ── Visualisation ───────────────────────────────────────────────────
+    # Visualisation─
     print("\n" + "=" * 40)
     print("GENERATING VISUALISATIONS")
     print("=" * 40)
