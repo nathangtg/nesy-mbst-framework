@@ -10,4 +10,36 @@ from nesy_mbst.symbolic.closed_loop import ClosedLoopAdapter
 from nesy_mbst.testing.test_generator import StatisticalTestGenerator
 from nesy_mbst.testing.metrics import Metrics
 
-__version__ = "0.1.0"
+# v2 Enhanced Modules
+from nesy_mbst.symbolic_v2.differentiable_logic import (
+    DifferentiableLogicGate,
+    DLIFeasibilityChecker,
+    TemperatureScheduler,
+)
+from nesy_mbst.symbolic_v2.continual_adapter import (
+    CUSUMDetector,
+    ElasticWeightConsolidation,
+    ContinualClosedLoopAdapter,
+)
+from nesy_mbst.learning_v2.probabilistic_induction import (
+    PDFA,
+    ProbabilisticInductionLearner,
+)
+from nesy_mbst.learning_v2.active_query import (
+    InformationGainSelector,
+    QueryStrategy,
+)
+from nesy_mbst.neural_v2.attention_constraint_extractor import (
+    AttentionConstraintExtractor,
+)
+from nesy_mbst.neural_v2.calibrated_oracle import (
+    CalibratedOracle,
+    UncertaintyEstimate,
+)
+from nesy_mbst.testing_v2.counterfactual_generator import (
+    CausalGraph,
+    CounterfactualTestGenerator,
+    ShapleyAnalyzer,
+)
+
+__version__ = "0.2.0"
