@@ -1,6 +1,6 @@
 % !TEX root = ../main.tex
 %% Section VI — Empirical Evaluation
-%% ------------------------------------------------------------------
+
 
 \section{Empirical Evaluation}%
 \label{sec:evaluation}
@@ -14,7 +14,7 @@ accuracy of states and transitions, (ii)~operational adequacy of the
 generated test suites, and (iii)~statistical fidelity of the synthesized
 behavioral models.
 
-%% ------------------------------------------------------------------
+
 \subsection{State and Transition Extraction Accuracy}%
 \label{sec:eval:extraction}
 
@@ -63,7 +63,7 @@ expected for safety-critical test artifacts~\cite{jumbl_mbst_tutorial}.
 
 Third, the proposed \textbf{NeSy-MBST Active Learning Oracle} attains
 the highest scores across every metric, reaching an overall system F1 of
-\textbf{0.9125}---a relative improvement of 14.8\% over the best
+\textbf{0.9125}which is a relative improvement of 14.8\% over the best
 single-model baseline and 39.1\% over the best GPT-4o multi-frame
 strategy.  The key driver of this improvement is the symbolic
 verification loop: by encoding extracted models into Markov chain and
@@ -84,13 +84,13 @@ difficulty by explicitly querying the LLM for missing edges identified
 through symbolic reachability analysis, converting a recall-limited
 generation problem into a verification-guided completion problem.
 
-%% ------------------------------------------------------------------
+
 \subsection{Operational Testing Metrics}
 \label{sec:eval:operational}
 
 To assess the practical utility of the generated models, we instantiate
 the NeSy-MBST pipeline on two real-world e-commerce system
-specifications---a \emph{User Model} and an \emph{Admin Model}---drawn
+specifications a \emph{User Model} and an \emph{Admin Model} is drawn
 from the operational profile study of~\cite{ecommerce_mbst}.
 Table~\ref{tab:operational_metrics} reports the model complexity and test
 generation characteristics.
@@ -128,7 +128,7 @@ transition at least once.  Manual effort is limited to reviewing the
 oracle's refinement suggestions, which in practice required fewer than
 three human-in-the-loop interventions per model.
 
-%% ------------------------------------------------------------------
+
 \subsection{Statistical Validation of Model Fidelity}
 \label{sec:eval:statistical}
 
@@ -185,7 +185,7 @@ validity of reliability estimates derived from the usage
 model~\cite{jumbl_mbst_tutorial} depends directly on how accurately the
 model reflects real operational profiles.
 
-%% ------------------------------------------------------------------
+
 \subsection{Summary of Findings}%
 \label{sec:eval:summary}
 
@@ -211,3 +211,8 @@ The empirical evaluation supports three principal conclusions:
     distributions, a prerequisite for valid model-based statistical
     testing.
 \end{enumerate}
+
+Section~\ref{sec:eval:ablation} presents a controlled ablation study
+that isolates the contribution of each NeSy-MBST component a symbolic
+loop, convex optimizer, and closed-loop feedback to the measured
+performance gains.

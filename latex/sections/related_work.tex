@@ -73,7 +73,7 @@ Commercial interface and functional testing \\
 \end{table*}
 
 A common thread across the tools listed in Table~\ref{tab:mbt_tools} is
-their reliance on handcrafted, domain-specific input artefacts---Markov
+their reliance on handcrafted, domain-specific input artefacts Markov
 chains~\cite{prowell_markov}, custom DSLs~\cite{jumbl_mbst_tutorial},
 AAL annotations~\cite{boehr_constraints}, or full UML state
 machines~\cite{mbt_overview_bme}. Constructing and maintaining these
@@ -106,8 +106,8 @@ until convergence, yielding more robust and consistent state-machine
 extractions.
 
 Beyond textual inputs, recent advances in multimodal LLMs have enabled
-the interpretation of \emph{visual} specifications---hand-drawn
-diagrams, whiteboard sketches, and scanned documents---into structured
+the interpretation of \emph{visual} specifications hand-drawn
+diagrams, whiteboard sketches, and scanned documents into structured
 UML artefacts~\cite{uml_benchmarking}. These capabilities suggest that
 the input barrier for model-based testing could be further lowered by
 accepting informal, heterogeneous documentation as a starting point for
@@ -148,15 +148,15 @@ generation.
                       font=\footnotesize},
 ]
 
-% --- Input ---
+%   Input  
 \node[box, fill=blue!10] (prompt) {Natural Language\\Prompt};
 
-% --- LLM container ---
+%   LLM container  
 \node[llmbox, right=1.8cm of prompt] (llm) {};
 \node[anchor=north, font=\small\bfseries] at ([yshift=-4pt]llm.north)
     {Large Language Model};
 
-% --- Two internal result boxes ---
+%   Two internal result boxes  
 \node[resultbox, fill=green!8] (single)
     at ([yshift=-2pt]llm.center |- {$(llm.north)!0.42!(llm.south)$})
     {Single-Prompt Baseline\\
@@ -169,7 +169,7 @@ generation.
      $F_1^{\mathrm{States}} \approx 0.85$\,,\;
      $F_1^{\mathrm{Trans}} \approx 0.65$};
 
-% --- Arrow ---
+%   Arrow  
 \draw[->, thick] (prompt.east) -- (llm.west);
 
 \end{tikzpicture}
@@ -179,7 +179,7 @@ representative $F_1$ scores for state and transition identification.}
 \label{fig:llm_pipeline}
 \end{figure}
 
-%  2.3 Frameworks for LLM-Driven State Machine Generation --------
+%  2.3 Frameworks for LLM-Driven State Machine Generation  --
 \subsection{Frameworks for LLM-Driven State Machine Generation}
 \label{sec:rw_frameworks}
 
@@ -210,8 +210,8 @@ nap_statistics} and can leverage the LLM's strength in entity extraction.
 Hybrid strategies combine the immediacy of single-prompt generation with
 structured, step-by-step refinement. A typical pipeline issues an
 initial broad prompt to obtain a draft state machine, then applies a
-sequence of targeted follow-up prompts---e.g., ``identify missing guard
-conditions'' or ``merge equivalent states''---to iteratively improve the
+sequence of targeted follow-up prompts e.g., ``identify missing guard
+conditions'' or ``merge equivalent states'' to iteratively improve the
 model~\cite{llm_state_machine_frameworks}. As shown in
 Fig.~\ref{fig:llm_pipeline}, hybrid approaches tend to achieve higher
 $F_1$ scores for state identification (${\approx}\,0.85$) compared with
@@ -225,6 +225,6 @@ Collectively, these related works establish that LLMs possess a
 demonstrable capacity to parse semi-structured and unstructured
 specifications into formal behavioural models. However, a comprehensive,
 end-to-end evaluation that benchmarks multiple prompting strategies
-against an established MBST toolchain---and that measures not only model
-fidelity but also downstream test-suite quality---remains an open gap in
+against an established MBST toolchain and that measures not only model
+fidelity but also downstream test-suite quality remains an open gap in
 the literature. The present study addresses this gap directly.

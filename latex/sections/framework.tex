@@ -6,7 +6,6 @@
 
 To resolve the limitations identified in the preceding analysis, this paper introduces a hybrid testing architecture: \emph{Neuro-Symbolic Model-Based Statistical Testing} (NeSy-MBST). The NeSy-MBST framework decouples semantic parsing from mathematical constraint resolution, combining the natural language capabilities of LLMs with the correctness guarantees of active automata learning, symbolic solvers, and closed-loop feedback adaptation~\cite{neuro_symbolic_framework, llm_numerical_reasoning}. Rather than delegating the entire model-construction pipeline to a single neural component, NeSy-MBST assigns each sub-task to the computational paradigm best suited for it: neural inference for ambiguous, language-laden reasoning, and symbolic computation for tasks demanding formal precision~\cite{llm_state_machine_frameworks}.
 
-%%% ---- TikZ Architecture Diagram ---- %%%
 \begin{figure*}[!t]
 \centering
 \begin{tikzpicture}[
@@ -132,7 +131,7 @@ Through iterative refinement, the $L^{*}$-based loop constructs a structurally v
 \subsection{Path-Dependent Hierarchical Modeling}%
 \label{subsec:hierarchical}
 
-A first-order Markov chain---the standard representation in classical MBST~\cite{jumbl_mbst_tutorial}---assumes that the probability of transitioning to the next state depends solely on the current state. In practice, many software behaviors exhibit \emph{path-dependent} patterns: the likelihood of a user action depends not only on the current screen but also on the sequence of prior interactions~\cite{usage_model_web}.
+A first-order Markov chain is the standard representation in classical MBST~\cite{jumbl_mbst_tutorial} where it assumes that the probability of transitioning to the next state depends solely on the current state. In practice, many software behaviors exhibit \emph{path-dependent} patterns: the likelihood of a user action depends not only on the current screen but also on the sequence of prior interactions~\cite{usage_model_web}.
 
 NeSy-MBST addresses this limitation through a two-tiered hierarchical architecture:
 
@@ -158,7 +157,7 @@ The hierarchical decomposition prevents state-space explosion while preserving f
 \subsection{Mathematical Constraint Optimization}%
 \label{subsec:constraint_opt}
 
-Once the state topology has been established and the hierarchical structure defined, NeSy-MBST must assign concrete transition probabilities. Rather than asking the LLM to produce numerical values directly---a task at which LLMs demonstrably struggle~\cite{llm_numerical_reasoning}---the framework offloads probability assignment to a symbolic constraint solver.
+Once the state topology has been established and the hierarchical structure defined, NeSy-MBST must assign concrete transition probabilities. Rather than asking the LLM to produce numerical values directly which is a task at which LLMs demonstrably struggle~\cite{llm_numerical_reasoning} where the framework offloads probability assignment to a symbolic constraint solver.
 
 The process proceeds in three stages:
 
@@ -196,6 +195,6 @@ During test execution, the framework continuously collects:
     \item \textbf{Failure data} recording test outcomes, defect locations, and failure modes.
 \end{itemize}
 
-When discrepancies are detected between the model's predicted behavior and the SUT's observed behavior, the divergences are automatically routed back to the modeling engine. The LLM component analyzes the nature and magnitude of each divergence---for example, identifying whether a discrepancy reflects an incorrect transition probability, a missing state, or a spurious edge---and proposes targeted model updates. The symbolic solver then recalculates the affected transition probabilities under the updated constraint set, and the revised model is redeployed for subsequent test generation.
+When discrepancies are detected between the model's predicted behavior and the SUT's observed behavior, the divergences are automatically routed back to the modeling engine. The LLM component analyzes the nature and magnitude of each divergence where for example, identifying whether a discrepancy reflects an incorrect transition probability, a missing state, or a spurious edge and proposes targeted model updates. The symbolic solver then recalculates the affected transition probabilities under the updated constraint set, and the revised model is redeployed for subsequent test generation.
 
 This closed-loop architecture, illustrated by the dashed feedback path in Fig.~\ref{fig:nesy_architecture}, ensures that the NeSy-MBST model converges toward an increasingly accurate representation of real-world usage as empirical data accumulates. The approach draws on the same iterative refinement philosophy that underpins active learning~\cite{lstar_llm}, extending it from the topology-discovery phase into the full testing lifecycle.

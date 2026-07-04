@@ -28,7 +28,7 @@ Constraint~\eqref{eq:nonnegativity} enforces non-negativity and boundedness of e
 \subsection{Structural Absence Constraints}%
 \label{subsec:structural_constraints}
 
-If the active learning phase determines that no valid transition exists between states~$s_i$ and~$s_j$---that is, no input stimulus triggers this transition in the inferred automaton---the corresponding probability is constrained to zero:
+If the active learning phase determines that no valid transition exists between states~$s_i$ and~$s_j$ that is, no input stimulus triggers this transition in the inferred automaton---the corresponding probability is constrained to zero:
 
 \begin{equation}
 \label{eq:structural_zero}
@@ -90,7 +90,7 @@ The expected number of transitions (mean first passage time) from state~$s_i$ to
 m_{ij} = 1 + \sum_{\substack{k=1 \\ k \neq j}}^{n} p_{ik} \cdot m_{kj}, \quad \forall\; i \neq j.
 \end{equation}
 
-To bound the expected traversal cost---ensuring that test sequences remain tractable in length---an upper-bound constraint is imposed:
+To bound the expected traversal cost ensuring that test sequences remain tractable in length an upper-bound constraint is imposed:
 
 \begin{equation}
 \label{eq:cost_bound}
