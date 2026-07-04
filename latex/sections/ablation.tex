@@ -13,8 +13,11 @@ transitions):
 \begin{enumerate}
     \item[\textbf{A}] \textbf{Pure-Neural.}  State/transition topology is
     extracted from natural-language requirements using heuristic regex
-    patterns (simulating a single-pass LLM extraction without structural
-    verification).  Transition probabilities are assigned uniformly.  No
+    patterns, simulating the structural output of a single-pass LLM
+    extraction without verification.  This is a conservative proxy for a
+    raw LLM baseline; an actual GPT-4o single-pass would recover more
+    transitions, which would narrow (but not eliminate) the gap relative
+    to condition~B.  Transition probabilities are assigned uniformly.  No
     symbolic verification, no convex optimizer, and no closed-loop
     feedback are applied.
 

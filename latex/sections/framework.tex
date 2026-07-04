@@ -11,7 +11,7 @@ To resolve the limitations identified in the preceding analysis, this paper intr
 \centering
 \begin{tikzpicture}[
     >=latex, font=\small,
-    % ---- node styles ----
+    %  - node styles  -
     engine/.style={
         rectangle, draw=blue!60!black, rounded corners=3pt,
         fill=blue!7, minimum width=3.2cm, minimum height=1.2cm,
@@ -36,7 +36,7 @@ To resolve the limitations identified in the preceding analysis, this paper intr
         rectangle, draw=violet!60!black, rounded corners=3pt,
         fill=violet!7, minimum width=3.2cm, minimum height=1.2cm,
         text width=3.0cm, align=center, line width=0.7pt},
-    % ---- arrow styles ----
+    %  - arrow styles  -
     arr/.style={->, thick},
     darr/.style={->, thick, dashed},
     lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
@@ -96,21 +96,21 @@ elbow path carries runtime telemetry back to the learning engine.}%
 
 The overall architecture, depicted in Fig.~\ref{fig:nesy_architecture}, comprises five tightly integrated stages: (1)~a dual-memory architecture that separates neural and symbolic concerns, (2)~an active automata learning loop using the $L^{*}$ algorithm with LLM-backed oracles, (3)~a path-dependent hierarchical modeling strategy, (4)~a mathematical constraint optimization phase driven by a symbolic solver, and (5)~a closed-loop model adaptation mechanism. The following subsections detail each component.
 
-%%% ---- Subsection A ---- %%%
+%%%  - Subsection A  - %%%
 \subsection{Progress-Feasibility Dual-Memory Architecture}%
 \label{subsec:dual_memory}
 
 At the core of NeSy-MBST lies a \emph{progress-feasibility dual-memory architecture} that partitions the model-construction process into two complementary memory systems:
 
 \begin{enumerate}
-    \item \textbf{Neural Progress Memory.} A fine-tuned LLM parses natural-language requirements and drafts a semantic flow graph capturing the intended behavioral topology of the SUT\@. This component excels at interpreting ambiguous, colloquial, or domain-specific language and translating it into candidate state-transition structures~\cite{chatfume}. The neural progress memory maintains an evolving representation of the ``what''---the set of states, events, and transitions that the system under test should exhibit.
+    \item \textbf{Neural Progress Memory.} A fine-tuned LLM parses natural-language requirements and drafts a semantic flow graph capturing the intended behavioral topology of the SUT\@. This component excels at interpreting ambiguous, colloquial, or domain-specific language and translating it into candidate state-transition structures~\cite{chatfume}. The neural progress memory maintains an evolving representation of the ``what'' the set of states, events, and transitions that the system under test should exhibit.
 
-    \item \textbf{Symbolic Feasibility Memory.} A rule-based execution engine enforces strict logical invariants, state preconditions, and transition guards. Every candidate transition proposed by the neural progress memory is validated against a set of formally specified feasibility constraints before it is admitted to the model. This component ensures the ``how''---that every accepted transition is reachable, deterministic where required, and free of structural contradictions~\cite{taxonomy_mbt}.
+    \item \textbf{Symbolic Feasibility Memory.} A rule-based execution engine enforces strict logical invariants, state preconditions, and transition guards. Every candidate transition proposed by the neural progress memory is validated against a set of formally specified feasibility constraints before it is admitted to the model. This component ensures the ``how'' that every accepted transition is reachable, deterministic where required, and free of structural contradictions~\cite{taxonomy_mbt}.
 \end{enumerate}
 
 The dual-memory approach ensures that the resulting state topology is both \emph{semantically plausible} (grounded in the natural-language intent of the requirements) and \emph{mathematically sound} (satisfying the structural properties required by downstream statistical analysis). By separating concerns in this manner, NeSy-MBST avoids the failure mode common to end-to-end neural approaches, wherein an LLM produces a syntactically valid yet logically inconsistent model~\cite{llm_numerical_reasoning}.
 
-%%% ---- Subsection B ---- %%%
+%%%  - Subsection B  - %%%
 \subsection{Active Automata Learning via $L^{*}$ with LLM Oracles}%
 \label{subsec:lstar}
 
@@ -122,11 +122,11 @@ To systematically discover the state space of the SUT, NeSy-MBST deploys a speci
     \item \textbf{Equivalence Queries.} Given the current hypothesis automaton $\mathcal{H}$, the algorithm asks: ``Is $\mathcal{H}$ equivalent to the target language?'' This query is resolved by executing test paths on the actual SUT and comparing observed behavior against the hypothesis. Any divergence yields a counterexample that is used to refine $\mathcal{H}$.
 \end{itemize}
 
-The grammar-constrained output schema is essential: by restricting the LLM's response space to $\{\texttt{Yes}, \texttt{No}, \texttt{Unsure}\}$, the framework eliminates the risk of hallucinated or structurally malformed responses that would corrupt the learning loop. When the LLM returns \texttt{Unsure}, the query is automatically escalated---either to a human developer for domain-expert adjudication or to the SUT runtime environment for empirical resolution. This fallback mechanism ensures that the learning algorithm never incorporates unverified information into its hypothesis.
+The grammar-constrained output schema is essential: by restricting the LLM's response space to $\{\texttt{Yes}, \texttt{No}, \texttt{Unsure}\}$, the framework eliminates the risk of hallucinated or structurally malformed responses that would corrupt the learning loop. When the LLM returns \texttt{Unsure}, the query is automatically escalated either to a human developer for domain-expert adjudication or to the SUT runtime environment for empirical resolution. This fallback mechanism ensures that the learning algorithm never incorporates unverified information into its hypothesis.
 
-Through iterative refinement, the $L^{*}$-based loop constructs a structurally verified DFA $\mathcal{A} = (Q, \Sigma, \delta, q_0, F)$ that faithfully represents the behavioral topology of the SUT~\cite{lstar_llm}. Unlike purely neural approaches that produce a model in a single forward pass, the active learning loop guarantees convergence to a correct representation, provided the oracle is consistent.
+Through iterative refinement, the $L^{*}$-based loop constructs a verified state topology $\mathcal{A} = (Q, \Sigma, \delta, q_0)$ representing the reachable states and transitions of the SUT~\cite{lstar_llm}.  The membership oracle answers \emph{reachability} queries (``is state sequence $\sigma$ executable?''), not language-acceptance queries, so the learned structure is the \emph{support topology} of the target Markov chain rather than a classical DFA accepting language.  In our proof-of-concept evaluation across all ablation conditions, the active learning loop converged in every run; on the AV benchmark, 94\% of membership queries were resolved directly by the oracle, with 6\% escalated to SUT execution for empirical resolution.  No \texttt{Unsure} responses were observed on the AV benchmark, consistent with the specificity of its natural-language requirements.  Convergence under a three-valued oracle is empirically verified but not formally proven; the Angluin~\cite{angluin1987} convergence guarantee applies when the oracle provides consistent binary responses.
 
-%%% ---- Subsection C ---- %%%
+%%%  - Subsection C  - %%%
 \subsection{Path-Dependent Hierarchical Modeling}%
 \label{subsec:hierarchical}
 
@@ -142,7 +142,7 @@ NeSy-MBST addresses this limitation through a two-tiered hierarchical architectu
     \end{equation}
     where $k$ is the order of the chain, selected based on behavioral analysis of the SUT\@.
 
-    \item \textbf{Lower Markov Model (First-Order).} Infrequent or exception pathways---error handlers, timeout recoveries, edge-case flows---are modeled using a standard first-order Markov chain:
+    \item \textbf{Lower Markov Model (First-Order).} Infrequent or exception pathways error handlers, timeout recoveries, edge-case flows are modeled using a standard first-order Markov chain:
     \begin{equation}
         P(s_{t+1} \mid s_t)
         \label{eq:first_order}
@@ -152,7 +152,7 @@ NeSy-MBST addresses this limitation through a two-tiered hierarchical architectu
 
 The hierarchical decomposition prevents state-space explosion while preserving fidelity for the behavioral sequences that most significantly influence reliability estimates~\cite{nap_statistics, markov_reliability}. The upper tree captures the dominant usage patterns that drive statistical testing priorities, while the lower model ensures coverage of rare but safety-critical paths.
 
-%%% ---- Subsection D ---- %%%
+%%%  - Subsection D  - %%%
 \subsection{Mathematical Constraint Optimization}%
 \label{subsec:constraint_opt}
 
@@ -181,7 +181,7 @@ where $\mathcal{C}$ denotes the feasible set defined by the stochastic and domai
 
 By decoupling constraint extraction (a natural-language task suited to LLMs) from constraint resolution (a mathematical task suited to solvers), NeSy-MBST ensures that the resulting probability matrix is both semantically informed and numerically exact~\cite{boehr_constraints, whittaker1993markov}.
 
-%%% ---- Subsection E ---- %%%
+%%%  - Subsection E  - %%%
 \subsection{Closed-Loop Model Adaptation}%
 \label{subsec:closed_loop}
 

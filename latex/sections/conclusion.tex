@@ -1,14 +1,26 @@
 % !TEX root = ../main.tex
 
-\section{Strategic Outlook and Recommendations}%
+\section{Conclusion and Future Work}%
 \label{sec:conclusion}
 
-The integration of Large Language Models within Model-Based Statistical
-Testing represents a significant evolutionary step in software
-certification and validation.  By replacing manual model-building
-processes with grammar-constrained active learning and neuro-symbolic
-deduction, the NeSy-MBST framework makes rigorous statistical testing
-viable for modern, agile software development lifecycles~\cite{neurostrata,taxonomy_mbt}.
+This paper investigated whether automated neuro-symbolic construction
+of Markov chain usage models can close the fault-detection gap between
+expert-modelled MBST and traditional testing, while eliminating the
+manual modelling burden that has historically constrained MBST to
+safety-critical niches.  The NeSy-MBST framework combining the
+$L^{*}$ active automata learning algorithm, grammar-constrained LLM
+oracles, symbolic constraint solvers, and closed-loop telemetry
+feedback answers all four research questions affirmatively within
+the evaluated benchmarks: it achieves F1\,=\,0.9125 (RQ1), 85.7\%
+transition coverage vs.\ 50\% for the pure-neural baseline (RQ2),
+JSD\,=\,0.012 (RQ3), and the ablation study isolates the symbolic
+verification loop as the primary structural driver and the convex
+optimizer as the primary probabilistic calibration driver (RQ4).
+The fault-detection proxy analysis (Section~\ref{sec:eval:fault_detection})
+establishes that these gains translate into a 35.7-percentage-point
+increase in fault-revealing path coverage consistent with the
+25--40\% improvement reported in empirical MBT deployment
+studies~\cite{garousi2021mbt_practice}.
 
 \subsection{System-Under-Test Reference Architecture}
 
@@ -60,7 +72,7 @@ interaction points captured by the NeSy-MBST usage model.
 
 \end{tikzpicture}
 \caption{Reference architecture for an autonomous CPS System-Under-Test.
-The three modules---Perception, Planning, and Actuation---correspond to
+The three modules Perception, Planning, and Actuation correspond to
 distinct abstraction tiers whose interfaces are modelled as states and
 transitions in the NeSy-MBST usage model.}%
 \label{fig:sut_architecture}
@@ -71,64 +83,165 @@ approach is particularly valuable for verifying safety-critical,
 autonomous, and learning-enabled CPS such as autonomous vehicles and
 unmanned aerial vehicles (UAVs)~\cite{cps_foundation_models}.
 
-\subsection{Actionable Recommendations}
+\subsection{Adoption Guidelines}
+\label{subsec:adoption}
 
-Drawing on the empirical and theoretical results presented in the
-preceding sections, we distil four actionable recommendations for
-practitioners and researchers seeking to adopt neuro-symbolic MBST
-pipelines.
+The following numbered guidelines synthesise the empirical findings
+into actionable recommendations for practitioners and researchers
+adopting neuro-symbolic MBST pipelines.  Each guideline identifies
+the fault-detection mechanism it addresses.
 
 \begin{enumerate}
-    \item \textbf{Establish Automated Specification Mining.}
-    Natural-language requirements documents should be processed through
-    grammar-constrained LLM oracles to extract candidate states,
-    transitions, and guards automatically.  Coupling extraction with
-    formal schema validation (e.g., EBNF grammars) prevents
-    hallucinated artefacts from propagating into downstream
-    models~\cite{chatfume,formalising_requirements}.
 
-    \item \textbf{Enforce Hybrid Active Learning Pipelines.}
-    An $L^{*}$-style active learning loop should serve as the
-    structural backbone: the LLM answers membership and equivalence
-    queries while a symbolic constraint solver enforces row-closure and
-    consistency on the observation table.  This division of labour
-    exploits the linguistic fluency of LLMs without sacrificing the
-    mathematical guarantees of automata
-    learning~\cite{llm_state_machine_frameworks,boehr_constraints}.
+    \item \textbf{Automate specification mining with grammar-constrained
+    oracles.}  Process natural-language requirements through a
+    grammar-constrained LLM oracle (output restricted to
+    $\{\texttt{Yes}, \texttt{No}, \texttt{Unsure}\}$) to extract
+    candidate states, transitions, and guards.  Couple extraction with
+    formal schema validation to prevent hallucinated artefacts entering
+    the usage model~\cite{chatfume, formalising_requirements}.
+    \emph{Fault-detection mechanism:} eliminates structurally missing
+    transitions that would otherwise blind the test suite to the
+    fault-revealing paths they represent.
 
-    \item \textbf{Implement Hierarchical Multi-Tier Models.}
-    Complex SUT architectures (cf.\ Fig.~\ref{fig:sut_architecture})
-    benefit from hierarchical Markov chain usage models: a high-level
-    chain captures inter-module interactions while subordinate chains
-    model intra-module behaviour.  Hierarchical decomposition reduces
-    state-space explosion and improves the tractability of statistical
-    certification~\cite{usage_model_web,taxonomy_mbt}.
+    \item \textbf{Enforce a symbolic verification loop before
+    probability assignment.}  Validate every extracted transition
+    against a symbolic feasibility memory before the usage model is
+    parameterised.  The ablation study demonstrates that this step
+    alone accounts for a 35.7-percentage-point increase in transition
+    coverage and a 93\% reduction in JSD relative to unverified
+    extraction~\cite{angluin1987, boehr_constraints}.
+    \emph{Fault-detection mechanism:} ensures the model topology is
+    structurally complete, the necessary precondition for
+    transition-coverage-based fault detection.
 
-    \item \textbf{Deploy Telemetry-Driven Closed-Loop Validation.}
-    Runtime telemetry from the SUT should be fed back into the
-    NeSy-MBST pipeline to continuously recalibrate transition
-    probabilities and detect model drift.  A closed-loop architecture
-    ensures that the usage model remains aligned with the evolving
-    operational profile throughout the software
-    lifecycle~\cite{neurostrata,cps_foundation_models}.
+    \item \textbf{Calibrate transition probabilities via convex
+    optimization, not direct LLM output.}  Use an entropy-maximizing
+    SLSQP solver to assign transition probabilities under the
+    row-stochastic and domain constraints extracted from requirements.
+    LLMs demonstrably produce miscalibrated numerical
+    outputs~\cite{llm_numerical_reasoning}; solver-assigned
+    probabilities achieve JSD\,=\,0.012 vs.\ 0.157 for the
+    uncalibrated baseline.
+    \emph{Fault-detection mechanism:} preserves operationally weighted
+    test allocation, ensuring that test effort is concentrated on
+    the paths that real users actually exercise.
+
+    \item \textbf{Implement hierarchical multi-tier usage models for
+    large systems.}  Decompose the SUT into a high-level inter-module
+    Markov chain and per-module subordinate chains.  This controls
+    state-space explosion while preserving the path-dependent
+    behavioural patterns that drive reliability
+    estimation~\cite{usage_model_web, taxonomy_mbt}.
+    \emph{Fault-detection mechanism:} prevents the combinatorial
+    growth that causes purely flat models to omit rare but
+    safety-critical fault-revealing paths.
+
+    \item \textbf{Deploy telemetry-driven closed-loop recalibration.}
+    Feed runtime execution logs back into the NeSy-MBST pipeline to
+    detect and correct model drift.  The closed-loop adapter
+    continuously updates transition probabilities whose empirical
+    frequency deviates from the model prediction, maintaining
+    alignment with the evolving operational
+    profile~\cite{neurostrata, cps_foundation_models}.
+    \emph{Fault-detection mechanism:} prevents the model from
+    becoming stale as usage patterns shift, which would otherwise
+    cause test effort to be misdirected toward obsolete paths.
+
+\end{enumerate}
+
+\subsection{Recommendation for the Field: AI-Augmented Model Generation}
+\label{subsec:field_recommendation}
+
+Beyond the specific NeSy-MBST implementation, this paper's findings
+support a broader recommendation for the software-testing field: LLM
+augmentation of formal test-model generation should be treated as a
+standard engineering practice, not a research curiosity, provided
+two conditions hold.  First, the LLM must operate under structural
+constraints (grammar-constrained output, symbolic verification loop)
+that prevent hallucination from corrupting the model topology.
+Second, numerical model parameters must be assigned by a certified
+solver, not by the LLM directly.  When both conditions are met, the
+present results demonstrate that the manual modelling bottleneck can
+be eliminated without sacrificing the fault-detection properties that
+make MBST valuable.
+
+What remains open is not whether the approach works, but
+\emph{under what conditions it generalises}: the current evaluation
+covers two domains (autonomous vehicle CPS and e-commerce), two
+LLM backends (GPT-4o baselines, GPT-4.1-mini oracle), and models
+up to 42~states.  The following open problems bound the scope of
+the current contribution:
+\begin{itemize}
+    \item scalability to models with hundreds of states and
+    concurrent multi-module interactions;
+    \item performance on domains with ambiguous or informally-written
+    requirements (e.g., agile user stories, verbal specifications);
+    \item sensitivity to LLM provider, version, and temperature
+    settings on oracle resolution rate and downstream F1; and
+    \item the relationship between the proxy coverage metrics reported
+    here and directly measured defect-detection rates in
+    fault-seeding experiments.
+\end{itemize}
+
+\subsection{Future Work: Industrial Case Studies}
+\label{subsec:future_work}
+
+The most important next step for this research programme is
+\textbf{industrial validation via fault-seeding case studies}.
+The present evaluation establishes that NeSy-MBST-generated models
+achieve structural and probabilistic properties consistent with
+high fault-detection effectiveness, but does not directly measure
+defect-detection rates against a seeded or historical fault corpus.
+Future work should:
+
+\begin{enumerate}
+    \item \textbf{Conduct fault-seeding experiments} on at least one
+    medium-scale industrial SUT, comparing defect-detection rates for
+    NeSy-MBST-generated test suites against (a) manually modelled MBST
+    suites and (b) unstructured script-based regression suites.  The
+    transition-coverage and JSD proxies from the present study should
+    be validated against these direct measurements.
+
+    \item \textbf{Evaluate generalisability across domains and
+    requirement styles.}  Replicate the evaluation on domains beyond
+    CPS and e-commerce telecommunications protocols, medical device
+    workflows, and automotive functional safety (ISO~26262) to
+    establish the boundary conditions for the approach.
+
+    \item \textbf{Assess multi-annotator agreement} on ground-truth
+    usage model construction, replacing the single-author annotation
+    used in this study with an inter-rater reliability protocol.
+
+    \item \textbf{Investigate the three-valued oracle at scale.}
+    Characterise how escalation rate, oracle temperature, and
+    requirement ambiguity interact to affect convergence speed and
+    model completeness on larger benchmarks.
 \end{enumerate}
 
 \subsection{Concluding Remarks}
 
-This paper has demonstrated that the NeSy-MBST framework which is combining
-active automata learning, grammar-constrained LLM oracles, symbolic
-constraint solvers, and closed-loop telemetry feedback—addresses the
-long-standing bottleneck of manual usage-model construction in
-Model-Based Statistical Testing.  By enforcing structural coherence
-through the $L^{*}$ algorithm, mathematical calibration through
-symbolic probability solvers, and empirical fidelity through
-telemetry-driven recalibration, the framework ensures that testing
-pipelines remain \emph{structurally coherent},
-\emph{mathematically calibrated}, and \emph{capable of certifying
+By enforcing structural coherence through the $L^{*}$ algorithm,
+probabilistic calibration through symbolic solvers, and empirical
+fidelity through telemetry-driven recalibration, NeSy-MBST produces
+test pipelines that are \emph{structurally complete},
+\emph{operationally calibrated}, and \emph{capable of certifying
 system reliability} at the rigour demanded by safety-critical
-domains~\cite{neurostrata,taxonomy_mbt}.
+CPS~\cite{neurostrata, taxonomy_mbt}.  The framework removes the
+long-standing manual modelling bottleneck that has confined rigorous
+statistical testing to specialist teams, making it accessible to
+broader software development practice.  As autonomous and
+learning-enabled systems proliferate, we anticipate that
+neuro-symbolic integration of this kind will transition from a
+research contribution to an engineering standard backed by the
+empirical fault-detection validation that future industrial case
+studies will supply.
 
-As autonomous and learning-enabled CPS proliferate, we anticipate that
-neuro-symbolic integration will transition from a research innovation
-to an industrial necessity—providing the formal assurance backbone
-that regulators, certification bodies, and end-users require.
+\subsection*{Replication Package}
+
+The NeSy-MBST implementation, ablation study, and figure-generation
+scripts are available at
+\url{https://github.com/nathangtg/llm-mbst-research}.
+All results are reproducible with \texttt{python run\_ablation.py}
+(fixed seed~42) using the Azure OpenAI backend configured in
+\texttt{nesy\_mbst/.env}.

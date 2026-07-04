@@ -526,31 +526,103 @@ once MDP-based models scale beyond small, hand-crafted examples.
 %  Synthesis
 
 
+% ---------------------------------------------------------------------------
+%  Fault-Detection Effectiveness: MBST vs Traditional Testing
+% ---------------------------------------------------------------------------
+
+\subsection{MBST vs.\ Traditional Testing: Fault-Detection Evidence}
+\label{sec:lr_fault_detection}
+
+A recurring theme across the reviewed literature is the claim that
+model-based testing improves fault detection over unstructured manual
+or script-based approaches.  This subsection consolidates the
+empirical evidence for that claim and its implications for the
+present work.
+
+\textbf{Industrial MBT deployment evidence.}
+Garousi et al.~\cite{garousi2021mbt_practice} provide the most
+directly applicable data point: an action-research deployment of
+GraphWalker-based MBT at a large Turkish software-testing firm
+reports a measurable increase in the number of distinct fault-revealing
+paths exercised per sprint, alongside a 25 to 40\% increase in
+real-fault detection effectiveness compared with the prior
+script-based regime.  Critically, the authors attribute this gain
+not to increased test volume but to \emph{structured transition
+coverage}: MBT-generated test suites systematically exercise
+state-transition edges that unstructured scripted tests omit, directly
+exposing logic faults located at infrequently-visited transitions.
+This finding motivates the use of transition coverage as a
+fault-detection proxy in Section~\ref{sec:eval:fault_detection}.
+
+\textbf{Coverage quality vs.\ quantity.}
+Ferrari et al.~\cite{ferrari2023transforming} synthesise 30 primary
+studies on the model-to-code transformation pipeline and identify a
+consistent pattern: model-level transition coverage translates into
+code-level branch coverage at a ratio of approximately 0.7 to 0.85,
+meaning that full model transition coverage typically achieves
+70 to 85\% branch coverage, a level that empirically correlates with
+significantly higher defect detection rates than random or
+coverage-unguided test generation.
+Al\'{e}groth et al.~\cite{alegroth2022practitioners} complement this
+with practitioner evidence: the primary reason industrial MBT
+deployments fail to realise their fault-detection potential is not
+algorithmic but \emph{model quality} specifically, under-specified
+or manually constructed models that omit transitions corresponding
+to boundary and error conditions.  This directly motivates the
+automated, verification-guided construction approach of NeSy-MBST.
+
+\textbf{Probabilistic test weighting and operational reliability.}
+Gerhold and Stoelinga~\cite{gerhold2016probabilistic} provide the
+theoretical link between probabilistic model calibration and
+fault-detection: their probabilistic ioco framework proves that a
+test suite generated from a correctly calibrated usage model detects
+any deviation from the specification with \emph{arbitrary precision}
+as the number of test sequences grows, whereas a miscalibrated model
+systematically under-samples the fault-revealing paths it assigns low
+probability.  This soundness result establishes the formal necessity
+of the convex optimization step in NeSy-MBST: extracting the right
+topology (RQ1) is necessary but not sufficient---the transition
+probabilities must accurately reflect operational usage (RQ3) for
+MBST's fault-detection guarantees to hold.
+
+\textbf{Gap addressed by this work.}
+None of the reviewed studies evaluates whether \emph{automated}
+usage-model construction as opposed to expert-authored models---can
+preserve the structural and probabilistic properties that underpin
+these fault-detection gains.  This gap is the direct motivation for
+RQ1--RQ4 and for the proxy analysis in
+Section~\ref{sec:eval:fault_detection}.
+
+%  Synthesis
 \subsection{Synthesis}
 \label{sec:lr_synthesis}
 
-Taken together, these twenty papers trace three converging lines of
-research.  First, the \textbf{model-based testing}
-tradition~\cite{prasetya2021coverage, alegroth2022practitioners,
-ferrari2023transforming, li2023generative, garousi2024coverage,
-gerhold2016probabilistic, garousi2021mbt_practice} has matured from
-academic proposals toward serious grappling with practical adoption
-barriers, coverage-measurement rigour, and the model-to-code
-transformation gap.  Second, the \textbf{statistical model checking}
+Taken together, these twenty papers and the fault-detection evidence
+above trace four converging lines of research.  First, the
+\textbf{model-based testing} tradition~\cite{prasetya2021coverage,
+alegroth2022practitioners, ferrari2023transforming, li2023generative,
+garousi2024coverage, gerhold2016probabilistic,
+garousi2021mbt_practice} has matured from academic proposals toward
+serious grappling with practical adoption barriers,
+coverage-measurement rigour, and the model-to-code transformation gap,
+with empirical evidence that transition-complete MBT improves
+fault-detection effectiveness by 25--40\% over unstructured testing.
+Second, the \textbf{statistical model checking}
 tradition~\cite{budde2025sound, kanav2025smc2024, prism_smc,
 smc_processors2023, soltani2023spare, agha2018survey, legay2010smc,
 larsen2014smc} has evolved from foundational tutorials (2010--2014)
-through a comprehensive survey (2018) to a current wave (2023--2025) of
-papers establishing genuine statistical soundness and extending SMC into
-entirely new domains computer architecture, spare-parts logistics,
-quantum calibration that share nothing with SMC's original
-formal-verification roots except the underlying statistical machinery.
-Third, a smaller but conceptually pivotal set of
+through a comprehensive survey (2018) to a current wave (2023--2025)
+establishing genuine statistical soundness and extending SMC into new
+domains.  Third, a conceptually pivotal set of
 papers~\cite{shin2021pasta, camilli2021uncertainty, liu2025prg4cnn,
 aichernig2017smc, lassaigne2012approximate} explicitly \textbf{bridges}
-testing and statistical/probabilistic verification, using MDPs, PCTL, and
-hypothesis testing as the common mathematical vocabulary.  Collectively,
-they support the view that treating uncertainty as a first-class,
-quantifiable concern rather than an obstacle to be abstracted away is
-now a mainstream, multi-disciplinary concern spanning software testing,
-formal methods, computer architecture, and machine-learning assurance.
+testing and statistical verification, providing the formal vocabulary
+(MDPs, PCTL, hypothesis testing) that underpins NeSy-MBST's
+mathematical formulations.  Fourth, the \textbf{fault-detection
+evidence} reviewed above establishes that model quality---specifically
+transition coverage and probability calibration---is the decisive
+determinant of MBST's practical fault-detection advantage, and that
+this quality has historically been a human-labour bottleneck.
+Collectively, they motivate treating automated, verified model
+construction as a first-class research objective rather than an
+implementation convenience.

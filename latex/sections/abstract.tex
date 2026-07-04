@@ -1,35 +1,34 @@
 % !TEX root = ../main.tex
 %% Abstract and IEEE Keywords
---
 
 \begin{abstract}
-Model-Based Statistical Testing (MBST) provides a principled approach
-to software certification by deriving test suites from stochastic
-usage models, yet the manual construction of these models remains
-prohibitively labour-intensive and error-prone.  Large Language Models
-(LLMs) offer a compelling opportunity to automate the parsing of
-natural-language requirements into formal state transition
-structures; however, their well-documented propensity for
-hallucination and lack of built-in mathematical guarantees limit
-direct applicability.  This paper introduces the
-\emph{Neuro-Symbolic MBST} (NeSy-MBST) framework, which synergises
-active automata learning ($L^{*}$ algorithm), grammar-constrained LLM
-oracles, symbolic constraint solvers, and closed-loop telemetry
-feedback to construct and maintain Markov chain usage models
-automatically.  Empirical evaluation on a representative autonomous
-vehicle case study demonstrates an F1 score of 0.9125 for
-state/transition extraction, a Jensen--Shannon divergence of 0.0142
-between the generated and reference probability distributions, and
-full model-coverage test generation in under six minutes.  These
-results indicate that neuro-symbolic integration can eliminate the
-manual modelling bottleneck while preserving the structural coherence
-and statistical rigour demanded by safety-critical Cyber-Physical
-Systems, thereby making MBST practically viable within modern agile
-development lifecycles.
+Manual construction of Markov chain usage models is the primary
+bottleneck preventing Model-Based Statistical Testing (MBST) from
+achieving its fault-detection potential beyond safety-critical niches.
+We introduce \emph{Neuro-Symbolic MBST} (NeSy-MBST), a framework that
+automates usage-model synthesis from natural-language requirements by
+combining $L^{*}$ active automata learning, grammar-constrained LLM
+oracles, a convex constraint solver, and closed-loop telemetry
+feedback.  Evaluated on an autonomous vehicle CPS benchmark and two
+e-commerce specifications, NeSy-MBST achieves: a system-level
+extraction F1 of \textbf{0.9125} (39.1\% above the best GPT-4o
+baseline, exceeding the 0.90 safety-critical threshold);
+\textbf{85.7\%} transition coverage versus 50\% for the pure-neural
+baseline a 35.7 percentage-point gain in fault-revealing path
+diversity; Jensen--Shannon divergence of \textbf{0.012} confirming
+preserved operational test-allocation fidelity; and full
+model-coverage test generation in under six minutes on models of up to
+42~states.  A controlled ablation study establishes that the symbolic
+verification loop drives structural completeness while the convex
+optimizer governs probabilistic calibration are two orthogonal
+properties that underpin MBST's fault-detection guarantees.  These
+results demonstrate that neuro-symbolic integration eliminates the
+manual modelling bottleneck without compromising the statistical
+rigour demanded by safety-critical Cyber-Physical Systems.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Model-Based Statistical Testing, Large Language Models,
-Neuro-Symbolic AI, Active Automata Learning, Markov Chain Usage
-Models, Software Quality Assurance
+Model-Based Statistical Testing, Fault Detection, Large Language
+Models, Neuro-Symbolic AI, Active Automata Learning, Markov Chain
+Usage Models, Software Quality Assurance, Automated Test Generation
 \end{IEEEkeywords}
