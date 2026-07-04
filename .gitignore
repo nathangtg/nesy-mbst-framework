@@ -1,13 +1,67 @@
-# Python-generated files
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
-*.py[oc]
-build/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
 dist/
+build/
 wheels/
-*.egg-info
+*.egg
+.installed.cfg
+MANIFEST
 
-# Virtual environments
-.venv
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
 
-# Environment files
+# ── Environment / secrets ──────────────────────────────────────────────────────
 .env
+*.env.local
+!nesy_mbst/.env.example
+
+# ── Testing ────────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ── IDE / editor ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ── Jupyter ────────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── LaTeX auxiliary ────────────────────────────────────────────────────────────
+latex/*.aux
+latex/*.bbl
+latex/*.blg
+latex/*.log
+latex/*.out
+latex/*.toc
+latex/*.lof
+latex/*.lot
+latex/*.fls
+latex/*.fdb_latexmk
+latex/*.synctex.gz
+texput.log
+
+# ── Generated output (reproducible from scripts) ──────────────────────────────
+output/autonomous_vehicle_cps_*.png
+output/autonomous_vehicle_cps_report.md
+output/research_figures/
+
+# Keep publication figures committed
+!output/figures/
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+*.orig
+*.rej

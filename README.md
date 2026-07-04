@@ -1,202 +1,43 @@
-# NeSy-MBST: Neuro-Symbolic Model-Based Statistical Testing
+# NeSy-MBST
 
-**LLM-Augmented Model-Based Statistical Testing: Auto-Generating Usage Models from Natural Language Requirements**
+### *The Machine Proposes. The Proof Disposes.*
+**Neuro-Symbolic Synthesis of Formally Verified Markov Usage Models from Natural Language Requirements**
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![arXiv](https://img.shields.io/badge/arXiv-coming_soon-red.svg)]()
+[![IEEE](https://img.shields.io/badge/venue-IEEE_submission-blue.svg)]()
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)]()
 
----
-
-> **NeSy-MBST** decouples *semantic parsing* (neural) from *mathematical constraint resolution* (symbolic) to automatically generate calibrated Markov chain usage models directly from natural language requirements — eliminating the manual modelling bottleneck in Model-Based Statistical Testing.
-
----
-
-## Table of Contents
-
-- [Background](#background)
-- [Framework](#framework)
-- [Mathematical Formulation](#mathematical-formulation)
-- [Empirical Results](#empirical-results)
-- [Repository Structure](#repository-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Output Gallery](#output-gallery)
-- [Known Limitations](#known-limitations)
-- [References](#references)
-- [Citation](#citation)
+**Authors:** Nathan G.¹² · Jordan Chay¹ · Jaeden Ting YiYong¹ · Wai Phyo Hein¹  
+¹ School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia  
+² Mercedes-Benz Tech Innovation  
 
 ---
 
-## Background
+## Overview
 
-**Model-Based Statistical Testing (MBST)** provides a mathematically rigorous approach to software certification. It derives test suites from stochastic *usage models* — directed graphs where nodes represent states-of-use and arcs carry transition probabilities defining an operational profile. These models enable testers to compute steady-state occupancy, mean first passage times, and statistically grounded sample sizes for reliability certification.
+**Model-Based Statistical Testing (MBST)** derives statistically optimal test suites from Markov chain usage models — directed graphs where transition probabilities encode real-world operational usage. Tests generated from these models systematically exercise fault-revealing paths in proportion to how frequently users take them, giving MBST a 25–40% fault-detection advantage over unstructured script-based testing. The barrier to adoption: constructing usage models manually requires weeks of formal-methods expertise.
 
-However, constructing usage models has historically been **manual, labour-intensive, and expert-dependent**. Translating narrative requirements into verified state-transition topologies with mathematically consistent probability matrices demands significant formal methods expertise — limiting MBST adoption to safety-critical domains such as aerospace, medical devices, and telecommunications.
+**NeSy-MBST eliminates that barrier.** It reads your natural-language requirements document and outputs a complete, mathematically verified Markov chain usage model — automatically. It then generates a full test suite from that model in under six minutes.
 
-**Purely neural approaches** introduce four structural failure modes:
-
-| Failure Mode | Description |
-|---|---|
-| Stochastic Volatility | LLMs lack stateful execution guarantees; hallucinated states and impossible transitions occur |
-| Calibration Failure | No mechanism enforces row-stochasticity ($\sum_j p_{ij} = 1$) or convex probability constraints |
-| State-Space Explosion | Finite context windows cannot track large, concurrent state spaces |
-| Semantic–Feasibility Divergence | Semantically plausible paths may be physically unexecutable |
-
-NeSy-MBST addresses all four by assigning each sub-task to the computational paradigm best suited for it.
+| Metric | Value |
+|---|:---:|
+| System-level extraction F1 | **0.9125** (threshold: 0.90) |
+| Transition coverage vs. pure-neural | **85.7%** vs 50.0% (+35.7 pp) |
+| Jensen–Shannon divergence | **0.012** |
+| Model generation time (42 states) | **< 6 minutes** |
+| Improvement over best GPT-4o baseline | **+39.1%** |
 
 ---
 
-## Framework
+## Research Questions
 
-NeSy-MBST operates as a five-stage neuro-symbolic pipeline. Each stage is described below, followed by the architecture diagram.
+This repository is the reference implementation for a paper submitted to IEEE TSE. The paper addresses four research questions:
 
-### Stage 1 — Dual-Memory Architecture
-
-Model construction is partitioned into two complementary components:
-
-- **Neural Progress Memory:** A fine-tuned LLM parses natural language requirements and drafts a semantic flow graph capturing intended behavioural topology.
-- **Symbolic Feasibility Memory:** A rule-based engine enforces logical invariants, preconditions, and transition guards before any candidate transition is admitted.
-
-This separation guarantees that the resulting model is both *semantically plausible* and *formally correct*.
-
-### Stage 2 — Active Automata Learning via L\* with LLM Oracles
-
-The L\* algorithm constructs a minimal DFA through two query types:
-
-- **Membership Queries** — "Does the SUT accept sequence $\sigma$?" Answered by a **grammar-constrained LLM oracle** whose output is restricted to $\{\texttt{Yes}, \texttt{No}, \texttt{Unsure}\}$, eliminating free-form hallucination.
-- **Equivalence Queries** — "Is hypothesis $\mathcal{H}$ equivalent to the target language?" Resolved by executing test paths on the SUT.
-
-`Unsure` responses are escalated to a human reviewer or SUT runtime, ensuring no unverified information enters the model.
-
-### Stage 3 — Path-Dependent Hierarchical Modelling
-
-Real software exhibits path-dependent behaviour. NeSy-MBST uses a two-tiered hierarchy:
-
-- **Upper Tree (Higher-Order Markov):** $P(s_{t+1} \mid s_t, s_{t-1}, \ldots, s_{t-k+1})$ captures multi-step dependencies for frequent patterns.
-- **Lower Model (First-Order Markov):** $P(s_{t+1} \mid s_t)$ handles infrequent and exception pathways without combinatorial explosion.
-
-### Stage 4 — Mathematical Constraint Optimisation
-
-Comparative relationships extracted from requirements (e.g., "checkout is twice as likely as browsing") are compiled into convex constraints and solved via entropy-maximising SLSQP:
-
-$$\mathbf{P}^{*} = \arg\min_{\mathbf{P}} \mathcal{L}(\mathbf{P}) \quad \text{s.t.} \quad \mathbf{P} \in \mathcal{C}$$
-
-This decoupling ensures the probability matrix is simultaneously *semantically informed* and *numerically exact*.
-
-### Stage 5 — Closed-Loop Model Adaptation
-
-Runtime telemetry from the SUT feeds back into the pipeline to detect divergence between predicted and observed behaviour and recalibrate transition probabilities via the symbolic solver. The usage model becomes a *living artifact* throughout the testing lifecycle.
-
-### Architecture
-
-```mermaid
-flowchart TD
-    NL["📄 Natural Language\nRequirements"]
-
-    subgraph NEURAL["Neural Layer"]
-        direction TB
-        NPM["Neural Progress Memory\nLLM semantic parsing"]
-        ORACLE["Grammar-Constrained\nLLM Oracle\n{Yes · No · Unsure}"]
-    end
-
-    subgraph SYMBOLIC["Symbolic Layer"]
-        direction TB
-        SFM["Symbolic Feasibility\nMemory\nrule-based guards"]
-        SOLVER["Convex Constraint\nSolver\nSLSQP · max-entropy"]
-    end
-
-    subgraph LEARNING["Active Learning Engine — L*"]
-        direction LR
-        MQ["Membership\nQueries"]
-        EQ["Equivalence\nQueries"]
-    end
-
-    SUT["System Under Test\nvalidation & telemetry"]
-
-    TOPO["Verified State\nTopology"]
-    MARKOV["Calibrated\nMarkov Model"]
-    TESTS["Executable\nTest Suites"]
-
-    NL --> NPM
-    NPM --> MQ
-    MQ --> ORACLE
-    ORACLE --> MQ
-    MQ --> EQ
-    EQ --> SUT
-    SUT --> EQ
-    EQ --> TOPO
-    TOPO --> SFM
-    SFM --> SOLVER
-    SOLVER --> MARKOV
-    MARKOV --> TESTS
-    TESTS --> SUT
-    SUT -->|"closed-loop\ntelemetry"| SOLVER
-
-    style NEURAL fill:#e8f4fd,stroke:#2196F3,stroke-width:2px
-    style SYMBOLIC fill:#f3e8fd,stroke:#9C27B0,stroke-width:2px
-    style LEARNING fill:#e8fdf0,stroke:#4CAF50,stroke-width:2px
-```
-
----
-
-## Mathematical Formulation
-
-The symbolic layer models probability assignment as a **constrained convex optimisation problem** over the transition matrix $\mathbf{P} = [p_{ij}] \in \mathbb{R}^{n \times n}$.
-
-### Constraint Families
-
-$$\text{(Probability Axioms)} \quad 0 \leq p_{ij} \leq 1, \quad \sum_{j=1}^{n} p_{ij} = 1 \quad \forall\, i$$
-
-$$\text{(Structural Absence)} \quad p_{ij} = 0 \quad \forall\, (i,j) \notin \mathcal{E}$$
-
-$$\text{(Operational Constraints)} \quad p_{ij} = \alpha \cdot p_{kl}, \quad \alpha \in \mathbb{R}_{>0}$$
-
-$$\text{(Steady-State)} \quad \boldsymbol{\pi}\mathbf{P} = \boldsymbol{\pi}, \quad \sum_i \pi_i = 1, \quad L_i \leq \pi_i \leq U_i$$
-
-$$\text{(Passage Time)} \quad m_{ij} \leq T_{\max}$$
-
-### Objective: Maximum Entropy
-
-Among all feasible solutions, NeSy-MBST selects the **least-biased** distribution — following the principle of maximum entropy to avoid unjustified preference for any particular transition:
-
-$$\max_{\mathbf{P}} \; H(\mathbf{P}) = -\sum_i \sum_j p_{ij} \ln p_{ij}$$
-
----
-
-## Empirical Results
-
-### State and Transition Extraction Accuracy
-
-| Method | State F1 | Trans. F1 | System F1 |
-|---|:---:|:---:|:---:|
-| Single-Prompt (GPT-4o) | 0.80 | 0.54 | 0.5431 |
-| Structure-Driven SMF (GPT-4o) | 0.7377 | 0.6050 | 0.6260 |
-| Event-Driven SMF (GPT-4o) | 0.6584 | 0.3690 | 0.3735 |
-| Hybrid SMF (GPT-4o) | 0.8582 | 0.6491 | 0.6559 |
-| Single-Prompt (Claude 3.5 Sonnet) | 0.90 | 0.75 | 0.7950 |
-| **NeSy-MBST (Ours)** | **0.9450** | **0.8950** | **0.9125** |
-
-NeSy-MBST achieves a **14.8% relative improvement** over the best single-model baseline (Claude 3.5 Sonnet) and a **39.1% improvement** over the best GPT-4o multi-frame strategy.
-
-### Operational Testing Metrics
-
-| Case Study | States | Transitions | Req. Coverage | Trans. Coverage | Generation Time |
-|---|:---:|:---:|:---:|:---:|:---:|
-| E-Commerce User | 24 | 112 | **100%** | **100%** | 1m 48s |
-| E-Commerce Admin | 42 | 218 | **100%** | **100%** | 5m 49s |
-
-Both models achieve **full coverage** with sub-quadratic scaling behaviour.
-
-### Statistical Validation
-
-| Metric | Formula | Value | Interpretation |
-|---|---|:---:|---|
-| Jensen–Shannon Divergence | $\frac{1}{2}D_{\text{KL}}(P\|M) + \frac{1}{2}D_{\text{KL}}(Q\|M)$ | **0.0142** | Near-identical marginal distributions |
-| Normalised Frobenius Distance | $\frac{\lVert P_{\text{real}} - P_{\text{synth}}\rVert_F}{n}$ | **0.0654** | High structural similarity in conditional dynamics |
-
-A JSD of 0.0142 on a $[0, 0.693]$ scale confirms that the synthesised Markov chain's steady-state behaviour is statistically indistinguishable from the reference model.
+- **RQ1 — Structural fidelity:** Can automated neuro-symbolic construction achieve F1 ≥ 0.90 for safety-critical test generation without manual effort?
+- **RQ2 — Fault-detection coverage:** Does a NeSy-MBST model produce higher transition coverage than a purely neural baseline?
+- **RQ3 — Probabilistic calibration:** Does symbolic constraint optimization preserve operationally weighted test allocation?
+- **RQ4 — Component necessity:** Which components (symbolic loop, convex optimizer, closed-loop feedback) are individually necessary?
 
 ---
 
@@ -205,61 +46,119 @@ A JSD of 0.0142 on a $[0, 0.693]$ scale confirms that the synthesised Markov cha
 ```
 llm-mbst-research/
 │
-├── run_demo.py                  # Full NeSy-MBST pipeline with visualisation
-├── run_evaluation.py            # Reproduces paper Tables I–III
-├── pyproject.toml               # Project configuration & dependencies
+├── README.md                        ← You are here
+├── SLIDES.md                        ← 15-minute presentation outline
+├── pyproject.toml                   ← Project metadata and dependencies
+├── uv.lock                          ← Locked dependency tree (uv)
 │
-├── latex/                       # IEEEtran paper source
-│   ├── main.tex
-│   ├── references.bib           # 28 references
+├── run_demo.py                      ← Full pipeline demo (AV CPS case study)
+├── run_evaluation.py                ← Reproduces paper Tables II–IV
+├── run_ablation.py                  ← Reproduces Table V (ablation study, seed=42)
+├── run_v2_evaluation.py             ← Extended v2 evaluation
+├── generate_figures.py              ← Generates all 5 publication figures (PDF+PNG)
+│
+├── nesy_mbst/                       ← Core Python package
+│   ├── agent/                       ← LLM integration layer
+│   │   ├── base_llm.py              ← BaseAgent abstract class (Azure OpenAI)
+│   │   ├── llm_adapter.py           ← callable(str)→str adapter
+│   │   └── system_prompts.py        ← Oracle and extractor prompts
+│   ├── core/                        ← Foundational data structures
+│   │   ├── state_machine.py         ← DFA and MarkovChain classes
+│   │   └── observation_table.py     ← L* observation table
+│   ├── learning/                    ← Active automata learning
+│   │   ├── lstar.py                 ← L* learner (Angluin 1987)
+│   │   └── hierarchical.py          ← Higher-order Markov chain model
+│   ├── learning_v2/                 ← Extended learning components
+│   │   ├── active_query.py          ← Multi-step oracle querying
+│   │   └── probabilistic_induction.py
+│   ├── neural/                      ← Neural layer
+│   │   ├── llm_oracle.py            ← Grammar-constrained oracle {Yes, No, Unsure}
+│   │   └── constraint_extractor.py  ← NL→constraint extraction
+│   ├── neural_v2/                   ← Enhanced neural components
+│   │   ├── calibrated_oracle.py     ← Calibrated multi-step oracle
+│   │   └── attention_constraint_extractor.py
+│   ├── symbolic/                    ← Symbolic layer
+│   │   ├── feasibility_checker.py   ← Rule-based transition validation
+│   │   ├── constraint_solver.py     ← SLSQP max-entropy convex solver
+│   │   └── closed_loop.py           ← Telemetry-driven recalibration
+│   ├── symbolic_v2/                 ← Extended symbolic components
+│   │   ├── differentiable_logic.py
+│   │   └── continual_adapter.py
+│   ├── testing/                     ← Test generation and metrics
+│   │   ├── test_generator.py        ← Statistical test suite generator
+│   │   └── metrics.py               ← F1, JSD, Frobenius, coverage
+│   ├── testing_v2/
+│   │   └── counterfactual_generator.py
+│   ├── demo/                        ← Benchmark case studies
+│   │   ├── autonomous_vehicle.py    ← AV CPS (9 states, 13 transitions)
+│   │   ├── ecommerce.py             ← E-commerce User + Admin models
+│   │   └── visualize.py             ← Matplotlib figure generation
+│   └── tests/                       ← Test suite (9 modules)
+│       ├── test_core.py
+│       ├── test_lstar.py
+│       ├── test_oracle.py
+│       ├── test_solver.py
+│       ├── test_closed_loop.py
+│       ├── test_hierarchical.py
+│       ├── test_metrics.py
+│       ├── test_base_llm.py
+│       ├── test_integration.py
+│       └── test_v2_modules.py
+│
+├── latex/                           ← IEEE paper source (IEEEtran)
+│   ├── main.tex                     ← Root document
+│   ├── references.bib               ← 55 verified entries (CrossRef/arXiv)
+│   ├── Makefile                     ← pdflatex + bibtex build
 │   └── sections/
-│       ├── introduction.tex
+│       ├── abstract.tex
+│       ├── introduction.tex         ← Includes RQ1–RQ4
+│       ├── literature_review.tex    ← 20 papers + fault-detection subsection
 │       ├── related_work.tex
 │       ├── bottlenecks.tex
 │       ├── framework.tex
 │       ├── mathematical_formulations.tex
-│       ├── evaluation.tex
-│       └── conclusion.tex
+│       ├── evaluation.tex           ← Tables II–IV + fault-detection analysis
+│       ├── ablation.tex             ← Table V (conditions A–D)
+│       ├── threats.tex              ← Threats to validity
+│       └── conclusion.tex           ← Adoption guidelines + future work
 │
-├── nesy_mbst/                   # Core Python package
-│   ├── agent/                   # LLM layer (BaseAgent, LLMBackendAdapter, prompts)
-│   ├── core/                    # DFA, MarkovChain, ObservationTable
-│   ├── learning/                # L* learner, hierarchical Markov model
-│   ├── neural/                  # Grammar-constrained oracle, constraint extractor
-│   ├── symbolic/                # Feasibility checker, SLSQP solver, closed-loop adapter
-│   ├── testing/                 # Statistical test generator, coverage & JSD metrics
-│   ├── demo/                    # Case studies (AV CPS, e-commerce) + matplotlib figures
-│   └── tests/                   # Unit and integration tests (9 modules)
-│
-└── output/                      # Generated figures and markdown reports
+└── output/                          ← Generated artefacts (not committed)
+    ├── figures/                     ← Publication figures (PDF + PNG)
+    │   ├── fig1_f1_comparison.*
+    │   ├── fig2_ablation_f1.*
+    │   ├── fig3_divergence.*
+    │   ├── fig4_coverage.*
+    │   └── fig5_radar.*
+    └── autonomous_vehicle_cps_*/    ← AV demo output reports
 ```
-
-#### Key Design Patterns
-
-| Pattern | Module | Purpose |
-|---|---|---|
-| Grammar-Constrained Oracle | `neural/llm_oracle.py` | Restricts LLM output to `{Yes, No, Unsure}` |
-| L\* Active Learning | `learning/lstar.py` | Systematic DFA inference via membership + equivalence queries |
-| Max-Entropy Convex Solver | `symbolic/constraint_solver.py` | scipy SLSQP with row-stochastic bounds |
-| Hierarchical Markov Model | `learning/hierarchical.py` | Higher-order tree + first-order fallback |
-| Closed-Loop Adaptation | `symbolic/closed_loop.py` | Telemetry-driven model recalibration |
-| Dual-Memory Architecture | `neural/` + `symbolic/` | Separates semantic understanding from formal correctness |
 
 ---
 
 ## Installation
 
-**Prerequisites:** Python ≥ 3.12 · Azure OpenAI API access (for LLM-powered mode)
+**Prerequisites:** Python ≥ 3.12 · Azure OpenAI API access (optional — simulator available)
+
+### With `uv` (recommended)
+
+```bash
+git clone https://github.com/nathangtg/llm-mbst-research
+cd llm-mbst-research
+uv sync
+```
+
+### With `pip`
 
 ```bash
 pip install -e .
 ```
 
-Configure Azure OpenAI credentials:
+### Configure credentials
 
 ```bash
 cp nesy_mbst/.env.example nesy_mbst/.env
 ```
+
+Edit `nesy_mbst/.env`:
 
 ```env
 AZURE_OPEN_AI_ENDPOINT=https://your-resource.openai.azure.com
@@ -267,30 +166,46 @@ AZURE_API_KEY=your-api-key
 AZURE_DEPLOYMENT=gpt-4.1-mini
 ```
 
-> **No API keys?** The pipeline runs fully in simulated mode using a built-in oracle:
-> ```bash
-> python run_demo.py --simulated
-> ```
+> **No API key?** All scripts fall back to a rule-based simulator — results are representative but use regex extraction rather than a live LLM.
 
 ---
 
-## Usage
+## Reproducing Paper Results
 
-**Run the full pipeline demo** on the Autonomous Vehicle CPS case study:
+### Figure generation (all 5 paper figures)
 
 ```bash
-python run_demo.py
+python generate_figures.py
+# → output/figures/fig1_f1_comparison.pdf  (Table II bar chart)
+# → output/figures/fig2_ablation_f1.pdf    (ablation F1)
+# → output/figures/fig3_divergence.pdf     (JSD + Frobenius)
+# → output/figures/fig4_coverage.pdf       (coverage by condition)
+# → output/figures/fig5_radar.pdf          (multi-dimensional radar)
 ```
 
-Executes all five pipeline stages and writes six paper-ready figures plus a markdown report to `output/`.
-
-**Reproduce paper results** (Tables I–III):
+### Tables II–IV (evaluation section)
 
 ```bash
 python run_evaluation.py
 ```
 
-**Run the test suite:**
+### Table V (ablation study, RQ4)
+
+```bash
+python run_ablation.py
+# Fixed seed=42, Azure OpenAI backend (falls back to simulator)
+# Reports: Sys.F1, JSD, Frobenius, coverage for conditions A–D
+```
+
+### Full pipeline demo
+
+```bash
+python run_demo.py
+# Autonomous Vehicle CPS case study: 9 states, 13 transitions
+# Generates figures and a Markdown report in output/
+```
+
+### Test suite
 
 ```bash
 python -m pytest nesy_mbst/tests/ -v
@@ -298,56 +213,117 @@ python -m pytest nesy_mbst/tests/ -v
 
 ---
 
-## Output Gallery
+## Framework Architecture
 
-| Figure | Description |
-|---|---|
-| `*_transition_heatmap.png` | Annotated transition probability matrix |
-| `*_steady_state.png` | Steady-state distribution bar chart |
-| `*_coverage_convergence.png` | State/transition coverage vs. number of test sequences |
-| `*_f1_scores.png` | F1 breakdown: state, transition, system |
-| `*_precision_recall.png` | Precision and recall for states and transitions |
-| `*_path_lengths.png` | Distribution of generated test path lengths |
+NeSy-MBST separates concerns by computational capability: neural inference handles ambiguous language; symbolic computation handles formal correctness.
+
+```
+Natural Language Requirements
+           │
+           ▼
+  ┌─────────────────────┐
+  │  Neural Layer       │  LLM reads requirements, extracts candidate
+  │  (LLM Oracle)       │  states/transitions, answers membership queries
+  └────────┬────────────┘
+           │  {Yes / No / Unsure}
+           ▼
+  ┌─────────────────────┐
+  │  L* Active Learning │  Systematically explores state space via
+  │  Engine             │  membership + equivalence queries
+  └────────┬────────────┘
+           │  hypothesis automaton
+           ▼
+  ┌─────────────────────┐
+  │  Symbolic Feasibility│  Rejects transitions violating invariants,
+  │  Checker            │  preconditions, and guard conditions
+  └────────┬────────────┘
+           │  verified topology
+           ▼
+  ┌─────────────────────┐
+  │  Convex Optimizer   │  Assigns transition probabilities via SLSQP
+  │  (SLSQP)            │  under row-stochastic + domain constraints
+  └────────┬────────────┘
+           │  calibrated matrix P*
+           ▼
+  ┌─────────────────────┐
+  │  Markov Chain       │  Complete usage model → statistical test
+  │  Usage Model        │  suite generation
+  └────────┬────────────┘
+           │
+           ▼  (runtime telemetry)
+  ┌─────────────────────┐
+  │  Closed-Loop        │  Detects model drift, recalibrates
+  │  Adapter            │  transition probabilities continuously
+  └─────────────────────┘
+```
+
+### Key component map
+
+| Component | File | Role |
+|---|---|---|
+| Grammar-Constrained Oracle | `neural/llm_oracle.py` | Restricts LLM to `{Yes, No, Unsure}` |
+| L\* Learner | `learning/lstar.py` | Systematic DFA inference (Angluin 1987) |
+| Feasibility Checker | `symbolic/feasibility_checker.py` | Rule-based structural validation |
+| Convex Solver | `symbolic/constraint_solver.py` | scipy SLSQP, max-entropy objective |
+| Hierarchical Model | `learning/hierarchical.py` | Higher-order tree + first-order fallback |
+| Closed-Loop Adapter | `symbolic/closed_loop.py` | Telemetry-driven recalibration |
+| Metrics | `testing/metrics.py` | F1, JSD, Frobenius, coverage |
 
 ---
 
-## Known Limitations
+## Ablation Study Results
 
-**Test coverage saturation.** Transition coverage of ~85.7% and state coverage of ~88.9% have not yet reached 100%. Increasing `max_sequences` in the test generator is expected to close this gap; convergence verification is ongoing.
+Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
 
-**One false-positive transition.** Transition precision of 0.93 reflects a single spurious transition introduced by the feasibility heuristic. Tightening the constraint budget is expected to eliminate it.
+| Condition | Sys. F1 | Trans. Coverage | JSD | Frobenius |
+|---|:---:|:---:|:---:|:---:|
+| A — Pure-Neural | 0.9036 | 50.0% | 0.157 | 0.163 |
+| B — +Symbolic Loop | **0.9818** | **85.7%** | 0.012 | 0.084 |
+| C — +Convex Optimizer | 0.9818 | 85.7% | 0.012 | 0.084 |
+| D — Full NeSy-MBST | 0.9818 | 85.7% | **0.012** | **0.084** |
 
-**Single-symbol oracle queries.** Current evaluation queries the LLM oracle on individual symbols only. Querying multi-step paths (sequences of 3–5 states) would constitute a stronger proof of oracle fidelity and is planned for the next evaluation cycle.
+**Symbolic loop** → primary driver of structural correctness and coverage (+35.7 pp).  
+**Convex optimizer** → primary driver of probabilistic calibration (JSD: 0.157 → 0.012).  
+**Closed-loop** → continuous fidelity maintenance over extended test campaigns.
 
 ---
 
-## References
+## Threats to Validity
 
-Key works informing this research:
-
-- Utting, Pretschner & Legeard — *A Taxonomy of Model-Based Testing Approaches* (2012)
-- Prowell — *Model-Based Statistical Testing* (JUMBL, 2003)
-- Böhr — *A Constraint-Based Approach to Software Usage Models* (2013)
-- L\*LM — *Learning Automata from Examples Using Natural Language Oracles* (2024)
-- ProtocolGPT — *Unleashing the Power of LLM to Infer State Machine* (2024)
-- ChatFuMe — *LLM-Assisted Model-Based Fuzzing of Protocol Implementations* (2025)
-- NeuroStrata — *Neuro-Symbolic Paradigms for Verifiability of Autonomous CPS* (2024)
-
-Full bibliography: `latex/references.bib` (28 entries).
+| Threat | Nature | Mitigation |
+|---|---|---|
+| Benchmark scope | 2 domains, max 42 states | Industrial case studies planned (see Future Work) |
+| Ground-truth annotation | Single-author | AV benchmark from formal spec; e-commerce tautological (disclosed in paper) |
+| Oracle consistency | Not formally proven | Empirically: 0% Unsure rate on AV benchmark; 94% direct / 6% SUT-escalated |
+| Statistical validity | Single seed (42) | Fully reproducible; multi-seed study in future work |
+| LLM provider | Azure GPT-4.1-mini only | Simulator fallback available; provider sensitivity in future work |
 
 ---
 
 ## Citation
 
 ```bibtex
-@techreport{nesy_mbst_2026,
-  author      = {Nathan G.},
-  title       = {{LLM-Augmented Model-Based Statistical Testing:
-                 Auto-Generating Usage Models from Natural Language Requirements}},
-  institution = {School of Computing and Artificial Intelligence, Sunway University},
-  year        = {2026},
+@article{nesy_mbst_2026,
+  author       = {Nathan G. and Jordan Chay and Jaeden Ting YiYong
+                  and Wai Phyo Hein},
+  title        = {The Machine Proposes. The Proof Disposes.:
+                  Neuro-Symbolic Synthesis of Formally Verified
+                  {Markov} Usage Models from Natural Language Requirements},
+  journal      = {IEEE Transactions on Software Engineering},
+  year         = {2026},
+  note         = {Under review. Preprint: \url{https://github.com/nathangtg/llm-mbst-research}}
 }
 ```
+
+---
+
+## Future Work
+
+1. **Fault-seeding experiments** — directly measure defect-detection rates against planted fault corpora; validate the transition-coverage proxy against actual bug catch rates
+2. **Industrial case studies** — deploy on real codebases in automotive (ISO 26262), medical devices, and telecommunications
+3. **Multi-annotator validation** — replace single-author ground truth with inter-rater reliability protocol
+4. **Domain generalisation** — evaluate on informally-written requirements (agile user stories, verbal specs)
+5. **Oracle sensitivity** — characterise how LLM provider, version, and temperature affect convergence and F1
 
 ---
 

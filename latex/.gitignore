@@ -1,4 +1,4 @@
-# LaTeX auxiliary files
+# LaTeX auxiliary — all reproducible via `make` or pdflatex
 *.aux
 *.bbl
 *.blg
@@ -14,5 +14,6 @@
 *.snm
 *.vrb
 
-# Compiled output (optional — uncomment to track PDF)
-# *.pdf
+# Keep the compiled PDF committed as the canonical artefact
+# (uncomment the line below to exclude it)
+# main.pdf
