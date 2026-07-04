@@ -1,7 +1,7 @@
-# ── Python ────────────────────────────────────────────────────────────────────
+# Python
 __pycache__/
-*.py[cod]
 *.pyo
+*.py[cod]
 *.pyd
 .Python
 *.egg-info/
@@ -12,35 +12,35 @@ wheels/
 .installed.cfg
 MANIFEST
 
-# ── Virtual environments ───────────────────────────────────────────────────────
+# Virtual environments
 .venv/
 venv/
 env/
 ENV/
 
-# ── Environment / secrets ──────────────────────────────────────────────────────
+# Environment / secrets
 .env
 *.env.local
 !nesy_mbst/.env.example
 
-# ── Testing ────────────────────────────────────────────────────────────────────
+# Testing and coverage
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 
-# ── IDE / editor ───────────────────────────────────────────────────────────────
+# IDE / editor
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
 
-# ── Jupyter ────────────────────────────────────────────────────────────────────
+# Jupyter 
 .ipynb_checkpoints/
 *.ipynb
 
-# ── LaTeX auxiliary ────────────────────────────────────────────────────────────
+# LaTeX auxiliary
 latex/*.aux
 latex/*.bbl
 latex/*.blg
@@ -54,7 +54,7 @@ latex/*.fdb_latexmk
 latex/*.synctex.gz
 texput.log
 
-# ── Generated output (reproducible from scripts) ──────────────────────────────
+# Generated output (reproducible from scripts)
 output/autonomous_vehicle_cps_*.png
 output/autonomous_vehicle_cps_report.md
 output/research_figures/
@@ -62,6 +62,6 @@ output/research_figures/
 # Keep publication figures committed
 !output/figures/
 
-# ── Misc ──────────────────────────────────────────────────────────────────────
+# Misc
 *.orig
 *.rej
