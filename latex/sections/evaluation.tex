@@ -59,11 +59,11 @@ Second, the Claude~3.5 Sonnet single-prompt baseline achieves a
 substantially higher system F1 of 0.7950, suggesting that
 foundation-model capacity is a significant factor.  However, even this
 strong neural baseline falls short of the 0.90 threshold commonly
-expected for safety-critical test artifacts~\cite{jumbl_mbst_tutorial}.
+expected for safety-critical test artifacts~\cite{whittaker1993markov,whittaker1994markov}.
 
 Third, the proposed \textbf{NeSy-MBST Active Learning Oracle} attains
 the highest scores across every metric, reaching an overall system F1 of
-\textbf{0.9125}which is a relative improvement of 14.8\% over the best
+\textbf{0.9125} a relative improvement of 14.8\% over the best
 single-model baseline and 39.1\% over the best GPT-4o multi-frame
 strategy.  The key driver of this improvement is the symbolic
 verification loop: by encoding extracted models into Markov chain and
@@ -74,6 +74,15 @@ triggers a targeted re-prompting cycle, as formalized in
 Section~\ref{sec:framework}, which monotonically increases model
 completeness until a fixed-point is reached or a maximum iteration bound
 is exceeded.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig1_f1_comparison}
+\caption{State, transition, and system F1 scores across all six prompting
+strategies.  The dashed line marks the 0.90 safety-critical threshold.
+NeSy-MBST (rightmost group, shaded) exceeds the threshold on all three metrics.}
+\label{fig:f1_comparison}
+\end{figure}
 
 The transition extraction F1 of 0.8950 is particularly noteworthy.
 Transition recovery is consistently the harder subtask across all
@@ -90,7 +99,7 @@ generation problem into a verification-guided completion problem.
 
 To assess the practical utility of the generated models, we instantiate
 the NeSy-MBST pipeline on two real-world e-commerce system
-specifications a \emph{User Model} and an \emph{Admin Model} is drawn
+specifications a \emph{User Model} and an \emph{Admin Model} drawn
 from the operational profile study of~\cite{ecommerce_mbst}.
 Table~\ref{tab:operational_metrics} reports the model complexity and test
 generation characteristics.
@@ -99,13 +108,16 @@ generation characteristics.
 \centering
 \caption{Operational Testing Metrics for E-Commerce System Models}
 \label{tab:operational_metrics}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{l r r c c r}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l r r r r l}
 \hline\hline
-\textbf{Model Target} & \textbf{States} & \textbf{Trans.} & \textbf{Req. Cov.} & \textbf{Trans. Cov.} & \textbf{Gen. Time} \\
+\textbf{Model} & \textbf{St.} & \textbf{Tr.} &
+\textbf{Req.} & \textbf{Tr.} & \textbf{Time} \\
+\textbf{Target} & & & \textbf{Cov.} & \textbf{Cov.} & \\
 \hline
-E-Commerce User   & 24  & 112 & 100\% & 100\% & 1\,min 48\,s \\
-E-Commerce Admin   & 42  & 218 & 100\% & 100\% & 5\,min 49\,s \\
+User   & 24  & 112 & 100\% & 100\% & 1\,m\,48\,s \\
+Admin  & 42  & 218 & 100\% & 100\% & 5\,m\,49\,s \\
 \hline\hline
 \end{tabular}
 \end{table}
@@ -122,7 +134,7 @@ fixed-point refinement strategy.
 These results validate the end-to-end workflow described
 in~\cite{ecommerce_mbst}: starting from natural-language requirements,
 the system autonomously produces a usage model from which a statistical
-test suite generator (analogous to JUMBL~\cite{jumbl_mbst_tutorial}) can
+test suite generator (analogous to JUMBL~\cite{whittaker1993markov,whittaker1994markov}) can
 derive test cases that provably cover every modeled requirement and every
 transition at least once.  Manual effort is limited to reviewing the
 oracle's refinement suggestions, which in practice required fewer than
@@ -135,26 +147,30 @@ three human-in-the-loop interventions per model.
 Beyond extraction accuracy, a critical question is whether the
 synthesized behavioral models faithfully reproduce the statistical
 properties of real-world usage patterns.  Following the Markov chain
-validation methodology of~\cite{markov_travel_diary}, we compute two
+validation methodology of~\cite{agha2018survey}, we compute two
 complementary divergence metrics between the generated model
 distributions and empirical reference distributions.
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Statistical Validation Metrics for Synthesized Behavioral Models}
 \label{tab:statistical_validation}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{l l l c}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.6cm} L{2.6cm} L{5.8cm} c}
 \hline\hline
 \textbf{Validation Metric} & \textbf{Behavioral Focus} & \textbf{Formula} & \textbf{Value} \\
 \hline
-Jensen--Shannon   & Aggregate Activity & $\mathrm{JSD}(P \| Q) = \frac{1}{2} D_{\mathrm{KL}}(P \| M)$ & \multirow{2}{*}{0.0142} \\
-\quad Divergence   & \quad Marginals     & $\quad + \frac{1}{2} D_{\mathrm{KL}}(Q \| M)$ & \\[4pt]
-Normalized        & State Transition   & $d_F = \dfrac{\| P_{\mathrm{real}} - P_{\mathrm{synth}} \|_F}{n}$ & \multirow{2}{*}{0.0654} \\
-\quad Frobenius Dist.\ & \quad Matrix Structure & & \\
+Jensen--Shannon Divergence &
+  Aggregate Activity Marginals &
+  $\displaystyle\mathrm{JSD}(P \| Q) = \tfrac{1}{2} D_{\mathrm{KL}}(P \| M) + \tfrac{1}{2} D_{\mathrm{KL}}(Q \| M)$ &
+  0.0142 \\[6pt]
+Normalized Frobenius Distance &
+  State Transition Matrix Structure &
+  $\displaystyle d_F = \frac{\| P_{\mathrm{real}} - P_{\mathrm{synth}} \|_F}{n}$ &
+  0.0654 \\
 \hline\hline
 \end{tabular}
-\end{table}
+\end{table*}
 
 \textbf{Jensen--Shannon Divergence (JSD).}  The JSD between the
 aggregate activity marginals of the real and synthesized distributions is
@@ -172,7 +188,7 @@ $0.0654$.  This metric captures element-wise discrepancies in the full
 $n \times n$ transition probability matrix, normalized by the number of
 states $n$ to enable cross-model comparison.  A value below $0.10$ is
 generally regarded as indicative of high structural
-similarity~\cite{markov_travel_diary}.  The achieved value of $0.0654$
+similarity~\cite{agha2018survey}.  The achieved value of $0.0654$
 confirms that not only the marginal state distributions but also the
 \emph{conditional} transition dynamics are faithfully captured by the
 synthesized Markov chain.
@@ -182,9 +198,18 @@ that the neuro-symbolic pipeline produces models whose statistical
 behavior closely mirrors empirically observed usage patterns.  This
 fidelity is essential for model-based statistical testing, where the
 validity of reliability estimates derived from the usage
-model~\cite{jumbl_mbst_tutorial} depends directly on how accurately the
+model~\cite{whittaker1993markov,whittaker1994markov} depends directly on how accurately the
 model reflects real operational profiles.
 
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig5_radar}
+\caption{Multi-dimensional comparison of NeSy-MBST against the two strongest
+baselines on six quality axes.  Probabilistic fidelity is shown as
+$(1 - \mathrm{JSD})$ so that a larger area universally indicates better performance.}
+\label{fig:radar}
+\end{figure}
 
 \subsection{Summary of Findings}%
 \label{sec:eval:summary}
@@ -213,6 +238,6 @@ The empirical evaluation supports three principal conclusions:
 \end{enumerate}
 
 Section~\ref{sec:eval:ablation} presents a controlled ablation study
-that isolates the contribution of each NeSy-MBST component a symbolic
+that isolates the contribution of each NeSy-MBST component symbolic
 loop, convex optimizer, and closed-loop feedback to the measured
 performance gains.

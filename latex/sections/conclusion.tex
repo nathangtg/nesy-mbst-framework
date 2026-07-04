@@ -19,63 +19,50 @@ Cyber-Physical System (CPS).  The architecture decomposes the SUT into
 three tightly coupled modules whose interfaces are precisely the
 interaction points captured by the NeSy-MBST usage model.
 
+% SUT Reference Architecture — descriptions embedded in module boxes,
+% arrows route between south/north anchors with no overlap
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}[
-    >=latex,
-    node distance=0.6cm and 1.4cm,
-    module/.style={
-        rectangle, draw, thick, rounded corners=3pt,
-        minimum width=5.8cm, minimum height=1.6cm,
-        fill=#1!8, draw=#1!70!black,
-        font=\small
+    >=latex, font=\small,
+    mod/.style 2 args={
+        rectangle, draw=#1!65!black, thick, rounded corners=4pt,
+        fill=#1!8, minimum width=5.2cm, text width=4.8cm,
+        align=center, inner sep=9pt
     },
-    sublabel/.style={
-        font=\scriptsize\itshape, text width=5.2cm, align=center
-    },
-    flow/.style={
-        ->, thick, draw=black!70
-    },
-    flowlabel/.style={
-        font=\scriptsize, midway, right=2pt
-    },
-    sutbox/.style={
-        rectangle, draw=black!60, dashed, thick,
-        rounded corners=5pt, inner sep=10pt
-    }
+    flow/.style={->, thick, draw=black!65, shorten >=2pt, shorten <=2pt},
+    arrlbl/.style={font=\scriptsize, fill=white, inner sep=1.5pt,
+                   midway, right=5pt}
 ]
 
-% Modules (stacked vertically) 
-\node[module=blue] (percep)
-    {\textbf{Perception Module}};
-\node[sublabel, below=0pt of percep.south]  (percep_desc)
-    {Processes sensor data (LiDAR, cameras);\\matches semantic graph};
+\node[mod={blue}{Perception}] (percep) {%
+    \textbf{Perception Module}\\[5pt]
+    {\scriptsize\itshape Processes LiDAR \& camera data;\\
+     constructs semantic scene graph}};
 
-\node[module=orange, below=1.6cm of percep] (plan)
-    {\textbf{Planning Module} {\scriptsize(Local / Global)}};
-\node[sublabel, below=0pt of plan.south] (plan_desc)
-    {Computes safe trajectories under\\physical motion invariants};
+\node[mod={orange}{Planning}, below=1.2cm of percep] (plan) {%
+    \textbf{Planning Module}
+    {\small (Local / Global)}\\[5pt]
+    {\scriptsize\itshape Computes safe trajectories\\
+     under physical motion invariants}};
 
-\node[module=red, below=1.6cm of plan] (act)
-    {\textbf{Actuation Module}};
-\node[sublabel, below=0pt of act.south] (act_desc)
-    {Executes physical steering /\\throttle controls};
+\node[mod={red}{Actuation}, below=1.2cm of plan] (act) {%
+    \textbf{Actuation Module}\\[5pt]
+    {\scriptsize\itshape Executes steering \&\\
+     throttle commands}};
 
-% — Data-flow arrows —
-\draw[flow] (percep.south) -- node[flowlabel] {coordinates} (plan.north);
-\draw[flow] (plan.south)   -- node[flowlabel] {commands}    (act.north);
+\draw[flow] (percep.south) -- node[arrlbl] {coordinates} (plan.north);
+\draw[flow] (plan.south)   -- node[arrlbl] {commands}    (act.north);
 
-% — SUT bounding box —
-\node[sutbox,
-      fit=(percep)(percep_desc)(plan)(plan_desc)(act)(act_desc),
-      label={[font=\small\bfseries, anchor=south]above:System Under Test (SUT)}
-     ] {};
+\node[draw=black!50, dashed, thick, rounded corners=6pt, inner sep=13pt,
+      fit=(percep)(plan)(act),
+      label={[font=\small\bfseries]above:System Under Test (SUT)}] {};
 
 \end{tikzpicture}
-\caption{Reference architecture for an autonomous CPS
-System-Under-Test.  The three modules—Perception, Planning, and
-Actuation—correspond to distinct abstraction tiers whose interfaces
-are modelled as states and transitions in the NeSy-MBST usage model.}%
+\caption{Reference architecture for an autonomous CPS System-Under-Test.
+The three modules---Perception, Planning, and Actuation---correspond to
+distinct abstraction tiers whose interfaces are modelled as states and
+transitions in the NeSy-MBST usage model.}%
 \label{fig:sut_architecture}
 \end{figure}
 
@@ -128,7 +115,7 @@ pipelines.
 
 \subsection{Concluding Remarks}
 
-This paper has demonstrated that the NeSy-MBST framework—combining
+This paper has demonstrated that the NeSy-MBST framework which is combining
 active automata learning, grammar-constrained LLM oracles, symbolic
 constraint solvers, and closed-loop telemetry feedback—addresses the
 long-standing bottleneck of manual usage-model construction in

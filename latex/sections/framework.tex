@@ -4,94 +4,93 @@
 \section{The Proposed NeSy-MBST Framework}%
 \label{sec:framework}
 
-To resolve the limitations identified in the preceding analysis, this paper introduces a hybrid testing architecture: \emph{Neuro-Symbolic Model-Based Statistical Testing} (NeSy-MBST). The NeSy-MBST framework decouples semantic parsing from mathematical constraint resolution, combining the natural language capabilities of LLMs with the correctness guarantees of active automata learning, symbolic solvers, and closed-loop feedback adaptation~\cite{neuro_symbolic_framework, llm_numerical_reasoning}. Rather than delegating the entire model-construction pipeline to a single neural component, NeSy-MBST assigns each sub-task to the computational paradigm best suited for it: neural inference for ambiguous, language-laden reasoning, and symbolic computation for tasks demanding formal precision~\cite{llm_state_machine_frameworks}.
+To resolve the limitations identified in the preceding analysis, this paper introduces a hybrid testing architecture: \emph{Neuro-Symbolic Model-Based Statistical Testing} (NeSy-MBST). The NeSy-MBST framework decouples semantic parsing from mathematical constraint resolution, combining the natural language capabilities of LLMs with the correctness guarantees of active automata learning, symbolic solvers, and closed-loop feedback adaptation~\cite{neuro_symbolic_framework, garcez2023neurosymbolic}. Rather than delegating the entire model-construction pipeline to a single neural component, NeSy-MBST assigns each sub-task to the computational paradigm best suited for it: neural inference for ambiguous, language-laden reasoning, and symbolic computation for tasks demanding formal precision~\cite{llm_state_machine_frameworks}.
 
+% NeSy-MBST Architecture — 3-column grid, all orthogonal arrows, no crossing
 \begin{figure*}[!t]
 \centering
 \begin{tikzpicture}[
-    >=stealth,
-    node distance=1.4cm and 1.8cm,
-    every node/.style={font=\small},
-    block/.style={
-        rectangle, draw, rounded corners=2pt,
-        minimum height=1.1cm, minimum width=2.8cm,
-        text centered, text width=2.6cm,
-        fill=white, line width=0.6pt
-    },
-    wideblock/.style={
-        rectangle, draw, rounded corners=2pt,
-        minimum height=1.1cm, minimum width=3.6cm,
-        text centered, text width=3.4cm,
-        fill=white, line width=0.6pt
-    },
+    >=latex, font=\small,
+    % ---- node styles ----
     engine/.style={
-        block, fill=blue!8, draw=blue!50!black
-    },
+        rectangle, draw=blue!60!black, rounded corners=3pt,
+        fill=blue!7, minimum width=3.2cm, minimum height=1.2cm,
+        text width=3.0cm, align=center, line width=0.7pt},
     oracle/.style={
-        block, fill=green!8, draw=green!50!black
-    },
+        rectangle, draw=green!60!black, rounded corners=3pt,
+        fill=green!7, minimum width=3.2cm, minimum height=1.2cm,
+        text width=3.0cm, align=center, line width=0.7pt},
     sut/.style={
-        block, fill=red!8, draw=red!50!black
-    },
+        rectangle, draw=red!60!black, rounded corners=3pt,
+        fill=red!7, minimum width=3.2cm, minimum height=1.2cm,
+        text width=3.0cm, align=center, line width=0.7pt},
+    topo/.style={
+        rectangle, draw=yellow!70!black, rounded corners=3pt,
+        fill=yellow!12, minimum width=3.2cm, minimum height=1.0cm,
+        text width=3.0cm, align=center, line width=0.7pt},
     solver/.style={
-        wideblock, fill=orange!8, draw=orange!50!black
-    },
-    output/.style={
-        wideblock, fill=violet!8, draw=violet!50!black
-    },
-    topology/.style={
-        rectangle, draw, rounded corners=2pt,
-        minimum height=0.9cm, minimum width=3.0cm,
-        text centered, text width=2.8cm,
-        fill=yellow!10, draw=yellow!50!black,
-        line width=0.6pt
-    },
-    arr/.style={->, thick, >=latex},
-    darr/.style={->, thick, >=latex, dashed}
+        rectangle, draw=orange!70!black, rounded corners=3pt,
+        fill=orange!8, minimum width=3.2cm, minimum height=1.2cm,
+        text width=3.0cm, align=center, line width=0.7pt},
+    outnode/.style={
+        rectangle, draw=violet!60!black, rounded corners=3pt,
+        fill=violet!7, minimum width=3.2cm, minimum height=1.2cm,
+        text width=3.0cm, align=center, line width=0.7pt},
+    % ---- arrow styles ----
+    arr/.style={->, thick},
+    darr/.style={->, thick, dashed},
+    lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
 ]
 
-% --- Active Learning Engine ---
-\node[engine] (ale) {Active Learning Engine\\{\scriptsize ($L^{*}$ Algorithm)}};
+%% ── Column coordinates ──────────────────────────────────────────────────────
+%% Left col  x=0   (ALE, Topo, Solver, Output  — vertical spine)
+%% Mid  col  x=4.6 (anchor for horizontal label helpers)
+%% Right col x=5.0 (Oracle row 1, SUT row 2)
 
-% --- LLM Oracle ---
-\node[oracle, right=2.2cm of ale] (oracle) {Grammar-Constrained\\LLM Oracle\\{\scriptsize Output: \{Yes, No, Unsure\}}};
+%% Row 1
+\node[engine]  (ale)    at (0,   0)    {Active Learning Engine\\{\scriptsize ($L^{*}$ Algorithm)}};
+\node[oracle]  (oracle) at (5.0, 0)    {Grammar-Constrained\\LLM Oracle\\{\scriptsize Out: \{Yes,\,No,\,Unsure\}}};
 
-% --- SUT ---
-\node[sut, below=1.6cm of oracle] (sut) {SUT Execution\\Validation\\{\scriptsize Returns counterexamples}};
+%% Row 2
+\node[sut]     (sut)    at (5.0,-2.6)  {SUT Execution\\Validation\\{\scriptsize Returns counterexamples}};
+\node[topo]    (topo)   at (0,  -2.6)  {Verified State\\Topology};
 
-% --- Verified state topology ---
-\node[topology, below=1.6cm of ale] (topo) {Verified State\\Topology};
+%% Row 3
+\node[solver]  (solver) at (0,  -5.0)  {Symbolic Constraint\\Solver\\{\scriptsize Convex equations}};
 
-% --- Symbolic Constraint Solver ---
-\node[solver, below=1.5cm of topo] (solver) {Symbolic Constraint\\Solver\\{\scriptsize Convex equations}};
+%% Row 4
+\node[outnode] (out)    at (0,  -7.2)  {Calibrated Markov Usage\\Model $\to$ Executable\\Test Sequences};
 
-% --- Output ---
-\node[output, below=1.4cm of solver] (out) {Calibrated Markov Usage\\Model $\rightarrow$ Executable\\Test Sequences};
+%% ── Arrows ──────────────────────────────────────────────────────────────────
 
-% --- Arrows ---
-% ALE -> Oracle (membership queries)
-\draw[arr] (ale.east) -- node[above, font=\scriptsize, text width=1.8cm, align=center] {membership\\queries} (oracle.west);
+% ALE → Oracle  (horizontal right)
+\draw[arr] (ale.east) -- node[lbl, above] {membership queries} (oracle.west);
 
-% ALE -> SUT (equivalence queries)
-\draw[arr] (ale.south east) -- node[right, font=\scriptsize, text width=1.8cm, align=center, pos=0.4] {equivalence\\queries} (sut.north west);
+% Oracle → Topo  (drop straight down on the right spine)
+\draw[arr] (oracle.south) -- node[lbl, right] {responses} (sut.north);
 
-% Oracle -> Topo
-\draw[arr] (oracle.south west) -- node[left, font=\scriptsize, pos=0.4] {responses} (topo.north east);
+% ALE → SUT  (horizontal right then elbow down — fully orthogonal, no overlap)
+\draw[arr] (ale.south) -- ++(0,-0.6) -| node[lbl, right, pos=0.15] {equiv.\ queries} (sut.west);
 
-% SUT -> Topo (counterexamples)
-\draw[arr] (sut.west) -- node[above, font=\scriptsize] {counterexamples} (topo.east);
+% SUT → Topo  (horizontal left)
+\draw[arr] (sut.west) -- node[lbl, above] {counterexamples} (topo.east);
 
-% Topo -> Solver
-\draw[arr] (topo.south) -- node[right, font=\scriptsize] {state graph} (solver.north);
+% Topo → Solver
+\draw[arr] (topo.south) -- node[lbl, right] {state graph} (solver.north);
 
-% Solver -> Output
-\draw[arr] (solver.south) -- node[right, font=\scriptsize] {matrix $\mathbf{P}$} (out.north);
+% Solver → Output
+\draw[arr] (solver.south) -- node[lbl, right] {matrix $\mathbf{P}$} (out.north);
 
-% Feedback loop (closed-loop)
-\draw[darr] (out.west) -- ++(-1.4,0) |- node[left, font=\scriptsize, pos=0.25, text width=1.6cm, align=center] {runtime\\feedback} (ale.west);
+% Feedback  (elbow left of spine, fully orthogonal)
+\draw[darr] (out.west) -- ++(-1.2,0) |- node[lbl, left, pos=0.25] {runtime feedback} (ale.west);
 
 \end{tikzpicture}
-\caption{Architecture of the NeSy-MBST framework. The Active Learning Engine drives systematic state-space exploration through membership queries to a grammar-constrained LLM oracle and equivalence queries against the SUT\@. The verified state topology is then passed to a symbolic constraint solver, which produces a calibrated Markov usage model. A closed-loop feedback path enables continuous model adaptation.}%
+\caption{Architecture of the NeSy-MBST framework. The Active Learning Engine
+(left spine) issues membership queries to the grammar-constrained LLM oracle
+(right, row 1) and equivalence queries to SUT execution (right, row 2).
+Both return orthogonally to the verified state topology, which feeds the
+symbolic constraint solver and the calibrated Markov usage model. A dashed
+elbow path carries runtime telemetry back to the learning engine.}%
 \label{fig:nesy_architecture}
 \end{figure*}
 
@@ -115,7 +114,7 @@ The dual-memory approach ensures that the resulting state topology is both \emph
 \subsection{Active Automata Learning via $L^{*}$ with LLM Oracles}%
 \label{subsec:lstar}
 
-To systematically discover the state space of the SUT, NeSy-MBST deploys a specialized variant of the $L^{*}$ active automata learning algorithm~\cite{lstar_llm}. The $L^{*}$ algorithm constructs a minimal deterministic finite automaton (DFA) by posing two types of queries:
+To systematically discover the state space of the SUT, NeSy-MBST deploys a specialized variant of the $L^{*}$ active automata learning algorithm~\cite{angluin1987,lstar_llm}. The $L^{*}$ algorithm constructs a minimal deterministic finite automaton (DFA) by posing two types of queries:
 
 \begin{itemize}
     \item \textbf{Membership Queries.} Given a candidate input sequence $\sigma \in \Sigma^{*}$, the algorithm queries the oracle: ``Does the SUT accept $\sigma$?'' In NeSy-MBST, the oracle is a grammar-constrained LLM whose output vocabulary is restricted to three tokens: \texttt{Yes}, \texttt{No}, or \texttt{Unsure}.
@@ -131,7 +130,7 @@ Through iterative refinement, the $L^{*}$-based loop constructs a structurally v
 \subsection{Path-Dependent Hierarchical Modeling}%
 \label{subsec:hierarchical}
 
-A first-order Markov chain is the standard representation in classical MBST~\cite{jumbl_mbst_tutorial} where it assumes that the probability of transitioning to the next state depends solely on the current state. In practice, many software behaviors exhibit \emph{path-dependent} patterns: the likelihood of a user action depends not only on the current screen but also on the sequence of prior interactions~\cite{usage_model_web}.
+A first-order Markov chain is the standard representation in classical MBST~\cite{whittaker1993markov,whittaker1994markov} where it assumes that the probability of transitioning to the next state depends solely on the current state. In practice, many software behaviors exhibit \emph{path-dependent} patterns: the likelihood of a user action depends not only on the current screen but also on the sequence of prior interactions~\cite{usage_model_web}.
 
 NeSy-MBST addresses this limitation through a two-tiered hierarchical architecture:
 
@@ -180,7 +179,7 @@ A convex programming engine solves the resulting system to produce the transitio
 \end{equation}
 where $\mathcal{C}$ denotes the feasible set defined by the stochastic and domain constraints, and $\mathcal{L}(\cdot)$ is the regularization objective.
 
-By decoupling constraint extraction (a natural-language task suited to LLMs) from constraint resolution (a mathematical task suited to solvers), NeSy-MBST ensures that the resulting probability matrix is both semantically informed and numerically exact~\cite{boehr_constraints, jumbl_mbst_tutorial}.
+By decoupling constraint extraction (a natural-language task suited to LLMs) from constraint resolution (a mathematical task suited to solvers), NeSy-MBST ensures that the resulting probability matrix is both semantically informed and numerically exact~\cite{boehr_constraints, whittaker1993markov}.
 
 %%% ---- Subsection E ---- %%%
 \subsection{Closed-Loop Model Adaptation}%

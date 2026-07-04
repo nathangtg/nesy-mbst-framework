@@ -74,9 +74,9 @@ Commercial interface and functional testing \\
 
 A common thread across the tools listed in Table~\ref{tab:mbt_tools} is
 their reliance on handcrafted, domain-specific input artefacts Markov
-chains~\cite{prowell_markov}, custom DSLs~\cite{jumbl_mbst_tutorial},
+chains~\cite{prowell_markov}, custom DSLs~\cite{whittaker1993markov,whittaker1994markov},
 AAL annotations~\cite{boehr_constraints}, or full UML state
-machines~\cite{mbt_overview_bme}. Constructing and maintaining these
+machines~\cite{pretschner2005mbt}. Constructing and maintaining these
 artefacts remains the principal bottleneck for wider industrial
 adoption~\cite{taxonomy_mbt}. It is precisely this bottleneck that
 motivates the exploration of LLMs as a means to automate or partially
@@ -131,51 +131,60 @@ repositories. These systems illustrate the growing convergence between
 visual understanding, natural-language processing, and automated test
 generation.
 
-%  TikZ Figure: LLM Pipeline 
+%  TikZ Figure: LLM Pipeline
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}[
-    node distance=1.6cm and 1.0cm,
-    >=latex,
+    >=latex, node distance=0pt,
     every node/.style={font=\small},
-    box/.style={draw, rounded corners=3pt, minimum height=0.9cm,
-                minimum width=3.0cm, align=center, fill=white},
-    llmbox/.style={draw, rounded corners=3pt, minimum height=3.4cm,
-                   minimum width=5.6cm, align=center,
-                   fill=gray!8, inner sep=8pt},
-    resultbox/.style={draw, rounded corners=2pt, minimum height=0.7cm,
-                      minimum width=4.8cm, align=center, fill=white,
-                      font=\footnotesize},
+    inbox/.style={
+        draw, rounded corners=3pt,
+        minimum height=1.0cm, minimum width=2.4cm,
+        align=center, fill=blue!8, draw=blue!50!black
+    },
+    container/.style={
+        draw=gray!60, rounded corners=4pt,
+        fill=gray!6, inner sep=10pt
+    },
+    resultbox/.style={
+        draw, rounded corners=3pt,
+        minimum width=4.4cm, minimum height=0.85cm,
+        align=center, font=\footnotesize
+    },
+    arr/.style={->, thick, >=latex},
 ]
 
-%   Input  
-\node[box, fill=blue!10] (prompt) {Natural Language\\Prompt};
+%% Input node
+\node[inbox] (prompt) {Natural Language\\Requirements};
 
-%   LLM container  
-\node[llmbox, right=1.8cm of prompt] (llm) {};
-\node[anchor=north, font=\small\bfseries] at ([yshift=-4pt]llm.north)
-    {Large Language Model};
+%% LLM container — placed to the right with explicit gap
+\node[container, right=1.6cm of prompt] (llmbox) {%
+    \begin{minipage}{5.0cm}
+        \centering
+        {\small\bfseries Large Language Model}\\[6pt]
+        \tikz{
+            \node[resultbox, fill=green!8, draw=green!50!black] (s1)
+                {Single-Prompt Baseline\\[2pt]
+                 $F_1^{\text{St}}\!\approx\!0.80$,\;
+                 $F_1^{\text{Tr}}\!\approx\!0.75$};
+            \node[resultbox, fill=orange!8, draw=orange!50!black,
+                  below=8pt of s1] (s2)
+                {Multi-Step / Hybrid\\[2pt]
+                 $F_1^{\text{St}}\!\approx\!0.85$,\;
+                 $F_1^{\text{Tr}}\!\approx\!0.65$};
+        }
+    \end{minipage}%
+};
 
-%   Two internal result boxes  
-\node[resultbox, fill=green!8] (single)
-    at ([yshift=-2pt]llm.center |- {$(llm.north)!0.42!(llm.south)$})
-    {Single-Prompt Baseline\\
-     $F_1^{\mathrm{States}} \approx 0.80$\,,\;
-     $F_1^{\mathrm{Trans}} \approx 0.75$};
-
-\node[resultbox, fill=orange!10] (multi)
-    at ([yshift=2pt]llm.center |- {$(llm.north)!0.75!(llm.south)$})
-    {Multi-Step / Hybrid Framework\\
-     $F_1^{\mathrm{States}} \approx 0.85$\,,\;
-     $F_1^{\mathrm{Trans}} \approx 0.65$};
-
-%   Arrow  
-\draw[->, thick] (prompt.east) -- (llm.west);
+%% Arrow with label above it
+\draw[arr] (prompt.east) -- node[above, font=\scriptsize, yshift=2pt]
+    {prompt} (llmbox.west);
 
 \end{tikzpicture}
-\caption{High-level LLM pipeline for state-machine extraction,
-contrasting single-prompt and multi-step generation strategies with
-representative $F_1$ scores for state and transition identification.}
+\caption{LLM pipeline for state-machine extraction. Single-prompt
+baselines achieve higher transition $F_1$ but lower state $F_1$ than
+multi-step hybrid strategies, motivating the NeSy-MBST active-learning
+loop.}
 \label{fig:llm_pipeline}
 \end{figure}
 

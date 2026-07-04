@@ -2,7 +2,7 @@
 \section{Mathematical Formulations}%
 \label{sec:mathematical_formulations}
 
-To generate the transition probabilities for the Markov chain usage model, the symbolic layer of NeSy-MBST models the state-transition structure as a constrained optimization problem~\cite{jumbl_mbst_tutorial, boehr_constraints}. This section formalises the mathematical foundations underlying the optimizer.
+To generate the transition probabilities for the Markov chain usage model, the symbolic layer of NeSy-MBST models the state-transition structure as a constrained optimization problem~\cite{whittaker1993markov, boehr_constraints}. This section formalises the mathematical foundations underlying the optimizer.
 
 Let $\mathcal{S} = \{s_1, s_2, \dots, s_n\}$ be the finite set of usage states identified by the $L^{*}$ active learning process~\cite{lstar_llm}. The stochastic matrix $\mathbf{P} = [p_{ij}] \in \mathbb{R}^{n \times n}$ represents the transition probabilities, where $p_{ij}$ denotes the probability of transitioning from state~$s_i$ to state~$s_j$. The optimizer must compute a feasible~$\mathbf{P}$ that simultaneously satisfies several families of structural and linear constraints, detailed in the following subsections.
 
@@ -80,7 +80,7 @@ The vector $\boldsymbol{\pi}$ characterises the long-run proportion of time the 
 L_i \leq \pi_i \leq U_i, \quad \forall\; i \in \{1, 2, \dots, n\},
 \end{equation}
 
-\noindent where $L_i$ and $U_i$ represent the lower and upper bounds, respectively, on the expected occupancy of state~$s_i$. These bounds are derived from operational profiles or domain expertise and ensure that the generated test suite allocates realistic proportions of effort to each functional area~\cite{jumbl_mbst_tutorial}.
+\noindent where $L_i$ and $U_i$ represent the lower and upper bounds, respectively, on the expected occupancy of state~$s_i$. These bounds are derived from operational profiles or domain expertise and ensure that the generated test suite allocates realistic proportions of effort to each functional area~\cite{whittaker1993markov,whittaker1994markov}.
 
 \subsubsection{Mean First Passage Times}
 The expected number of transitions (mean first passage time) from state~$s_i$ to state~$s_j$, denoted $m_{ij}$, is defined recursively as:

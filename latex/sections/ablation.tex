@@ -125,6 +125,24 @@ rather than structural incompleteness.  Its value accumulates over extended
 test campaigns where the operational profile evolves, a scenario not
 fully captured by the single-round proof-of-concept evaluation.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig2_ablation_f1}
+\caption{Ablation F1 scores on the AV CPS benchmark. The symbolic loop
+(A$\to$B) produces the sole structural gain; conditions C and D address
+probabilistic fidelity rather than topology.}
+\label{fig:ablation_f1}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig3_divergence}
+\caption{JSD and normalized Frobenius distance across ablation conditions
+(lower is better). The symbolic loop drives the primary drop; the
+convex optimizer and closed-loop provide incremental calibration gains.}
+\label{fig:ablation_divergence}
+\end{figure}
+
 \paragraph{Metric decomposition.}
 Table~\ref{tab:ablation} also clarifies the metric roles:
 \emph{F1} measures structural correctness (whether the right states and
