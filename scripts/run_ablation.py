@@ -38,7 +38,7 @@ import numpy as np
 from typing import Dict, Optional, Set, Tuple
 
 from dotenv import load_dotenv
-load_dotenv(os.path.join(os.path.dirname(__file__), "nesy_mbst", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", "nesy_mbst", ".env"))
 
 from nesy_mbst.core.state_machine import MarkovChain
 from nesy_mbst.demo.autonomous_vehicle import (

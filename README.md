@@ -10,7 +10,7 @@
 
 **Authors:** Nathan G.¹² · Jordan Chay¹ · Jaeden Ting YiYong¹ · Wai Phyo Hein¹
 > ¹ School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia
-> ² Mercedes-Benz Tech Innovation
+> ² Mercedes-Benz Tech Innovation, Cross Technologies
 
 ---
 
