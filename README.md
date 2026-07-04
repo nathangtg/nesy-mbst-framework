@@ -8,22 +8,24 @@
 [![IEEE](https://img.shields.io/badge/venue-IEEE_submission-blue.svg)]()
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)]()
 
-**Authors:** Nathan G.¹² · Jordan Chay¹ · Jaeden Ting YiYong¹ · Wai Phyo Hein¹  
-¹ School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia  
-² Mercedes-Benz Tech Innovation  
+**Authors:** Nathan G.¹² · Jordan Chay¹ · Jaeden Ting YiYong¹ · Wai Phyo Hein¹
+> ¹ School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia
+> ² Mercedes-Benz Tech Innovation
 
 ---
 
 ## Overview
 
-**Model-Based Statistical Testing (MBST)** derives statistically optimal test suites from Markov chain usage models — directed graphs where transition probabilities encode real-world operational usage. Tests generated from these models systematically exercise fault-revealing paths in proportion to how frequently users take them, giving MBST a 25–40% fault-detection advantage over unstructured script-based testing. The barrier to adoption: constructing usage models manually requires weeks of formal-methods expertise.
+**Model-Based Statistical Testing (MBST)** derives statistically optimal test suites from Markov chain usage models — directed graphs where transition probabilities encode real-world operational usage. Tests generated this way systematically exercise fault-revealing paths in proportion to how frequently users take them, giving MBST a 25–40% fault-detection advantage over unstructured script-based testing.
 
-**NeSy-MBST eliminates that barrier.** It reads your natural-language requirements document and outputs a complete, mathematically verified Markov chain usage model — automatically. It then generates a full test suite from that model in under six minutes.
+**The barrier:** constructing usage models manually requires weeks of formal-methods expertise. Teams skip it and ship weaker tests.
 
-| Metric | Value |
+**NeSy-MBST eliminates that barrier.** Feed it your requirements document — it produces a complete, mathematically verified Markov chain usage model and a full test suite automatically.
+
+| Metric | Result |
 |---|:---:|
-| System-level extraction F1 | **0.9125** (threshold: 0.90) |
-| Transition coverage vs. pure-neural | **85.7%** vs 50.0% (+35.7 pp) |
+| System-level extraction F1 | **0.9125** *(threshold: 0.90)* |
+| Transition coverage vs. pure-neural | **85.7%** vs 50.0% *(+35.7 pp)* |
 | Jensen–Shannon divergence | **0.012** |
 | Model generation time (42 states) | **< 6 minutes** |
 | Improvement over best GPT-4o baseline | **+39.1%** |
@@ -32,68 +34,137 @@
 
 ## Research Questions
 
-This repository is the reference implementation for a paper submitted to IEEE TSE. The paper addresses four research questions:
+| RQ | Question |
+|---|---|
+| **RQ1** | Can automated neuro-symbolic construction achieve F1 ≥ 0.90 without manual effort? |
+| **RQ2** | Does a NeSy-MBST model produce higher transition coverage than a purely neural baseline? |
+| **RQ3** | Does symbolic constraint optimization preserve operationally weighted test allocation? |
+| **RQ4** | Which components — symbolic loop, convex optimizer, closed-loop feedback — are individually necessary? |
 
-- **RQ1 — Structural fidelity:** Can automated neuro-symbolic construction achieve F1 ≥ 0.90 for safety-critical test generation without manual effort?
-- **RQ2 — Fault-detection coverage:** Does a NeSy-MBST model produce higher transition coverage than a purely neural baseline?
-- **RQ3 — Probabilistic calibration:** Does symbolic constraint optimization preserve operationally weighted test allocation?
-- **RQ4 — Component necessity:** Which components (symbolic loop, convex optimizer, closed-loop feedback) are individually necessary?
+---
+
+## Framework Architecture
+
+NeSy-MBST assigns each sub-task to the computational paradigm best suited for it: neural inference handles ambiguous language; symbolic computation handles formal correctness.
+
+```mermaid
+flowchart TD
+    NL["📄 Natural Language Requirements"]
+
+    subgraph NEURAL["🧠 Neural Layer"]
+        direction TB
+        ORACLE["Grammar-Constrained LLM Oracle\nOutput restricted to {Yes · No · Unsure}"]
+        EXTRACTOR["Constraint Extractor\nComparative relationships from NL"]
+    end
+
+    subgraph LEARNING["🔄 Active Learning Engine  —  L*"]
+        direction LR
+        MQ["Membership Queries\n'Is sequence σ valid?'"]
+        EQ["Equivalence Queries\n'Is hypothesis H correct?'"]
+    end
+
+    subgraph SYMBOLIC["⚙️ Symbolic Layer"]
+        direction TB
+        CHECKER["Feasibility Checker\nRejects impossible transitions"]
+        SOLVER["Convex Optimizer  —  SLSQP\nMax-entropy probability assignment"]
+        LOOP["Closed-Loop Adapter\nTelemetry-driven recalibration"]
+    end
+
+    SUT["🖥️ System Under Test"]
+    TOPO["Verified State Topology"]
+    MODEL["Calibrated Markov Chain Usage Model"]
+    TESTS["📋 Executable Test Suites"]
+
+    NL --> MQ
+    MQ --> ORACLE
+    ORACLE -->|Yes / No / Unsure| MQ
+    MQ --> EQ
+    EQ --> SUT
+    SUT -->|counterexamples| EQ
+    EQ --> TOPO
+    TOPO --> CHECKER
+    EXTRACTOR --> SOLVER
+    CHECKER --> SOLVER
+    SOLVER --> MODEL
+    MODEL --> TESTS
+    TESTS --> SUT
+    SUT -->|"runtime telemetry"| LOOP
+    LOOP --> SOLVER
+
+    style NEURAL   fill:#e8f4fd,stroke:#2196F3,stroke-width:2px
+    style SYMBOLIC fill:#f3e8fd,stroke:#9C27B0,stroke-width:2px
+    style LEARNING fill:#e8fdf0,stroke:#4CAF50,stroke-width:2px
+```
+
+### Component Map
+
+| Component | Module | Role |
+|---|---|---|
+| Grammar-Constrained Oracle | `nesy_mbst/neural/llm_oracle.py` | Restricts LLM output to `{Yes, No, Unsure}` |
+| L\* Learner | `nesy_mbst/learning/lstar.py` | Systematic DFA inference (Angluin 1987) |
+| Feasibility Checker | `nesy_mbst/symbolic/feasibility_checker.py` | Rule-based structural validation |
+| Convex Solver | `nesy_mbst/symbolic/constraint_solver.py` | scipy SLSQP, max-entropy objective |
+| Hierarchical Model | `nesy_mbst/learning/hierarchical.py` | Higher-order tree + first-order fallback |
+| Closed-Loop Adapter | `nesy_mbst/symbolic/closed_loop.py` | Telemetry-driven recalibration |
+| Metrics | `nesy_mbst/testing/metrics.py` | F1, JSD, Frobenius, coverage |
 
 ---
 
 ## Repository Structure
 
 ```
-llm-mbst-research/
+nesy-mbst/
 │
-├── README.md                        ← You are here
-├── SLIDES.md                        ← 15-minute presentation outline
-├── pyproject.toml                   ← Project metadata and dependencies
-├── uv.lock                          ← Locked dependency tree (uv)
+├── 📄 README.md                        — This file
+├── 📊 SLIDES.md                        — 15-minute presentation outline
+├── ⚙️  pyproject.toml                   — Package metadata & dependencies
+├── 🔒 uv.lock                          — Locked dependency tree
 │
-├── run_demo.py                      ← Full pipeline demo (AV CPS case study)
-├── run_evaluation.py                ← Reproduces paper Tables II–IV
-├── run_ablation.py                  ← Reproduces Table V (ablation study, seed=42)
-├── run_v2_evaluation.py             ← Extended v2 evaluation
-├── generate_figures.py              ← Generates all 5 publication figures (PDF+PNG)
+├── scripts/                            — Reproducibility entry points
+│   ├── run_demo.py                     — Full pipeline demo (AV CPS)
+│   ├── run_evaluation.py               — Reproduces paper Tables II–IV
+│   ├── run_ablation.py                 — Reproduces Table V (seed=42)
+│   ├── run_v2_evaluation.py            — Extended v2 component evaluation
+│   └── generate_figures.py             — All 5 publication figures (PDF+PNG)
 │
-├── nesy_mbst/                       ← Core Python package
-│   ├── agent/                       ← LLM integration layer
-│   │   ├── base_llm.py              ← BaseAgent abstract class (Azure OpenAI)
-│   │   ├── llm_adapter.py           ← callable(str)→str adapter
-│   │   └── system_prompts.py        ← Oracle and extractor prompts
-│   ├── core/                        ← Foundational data structures
-│   │   ├── state_machine.py         ← DFA and MarkovChain classes
-│   │   └── observation_table.py     ← L* observation table
-│   ├── learning/                    ← Active automata learning
-│   │   ├── lstar.py                 ← L* learner (Angluin 1987)
-│   │   └── hierarchical.py          ← Higher-order Markov chain model
-│   ├── learning_v2/                 ← Extended learning components
-│   │   ├── active_query.py          ← Multi-step oracle querying
-│   │   └── probabilistic_induction.py
-│   ├── neural/                      ← Neural layer
-│   │   ├── llm_oracle.py            ← Grammar-constrained oracle {Yes, No, Unsure}
-│   │   └── constraint_extractor.py  ← NL→constraint extraction
-│   ├── neural_v2/                   ← Enhanced neural components
-│   │   ├── calibrated_oracle.py     ← Calibrated multi-step oracle
-│   │   └── attention_constraint_extractor.py
-│   ├── symbolic/                    ← Symbolic layer
-│   │   ├── feasibility_checker.py   ← Rule-based transition validation
-│   │   ├── constraint_solver.py     ← SLSQP max-entropy convex solver
-│   │   └── closed_loop.py           ← Telemetry-driven recalibration
-│   ├── symbolic_v2/                 ← Extended symbolic components
-│   │   ├── differentiable_logic.py
-│   │   └── continual_adapter.py
-│   ├── testing/                     ← Test generation and metrics
-│   │   ├── test_generator.py        ← Statistical test suite generator
-│   │   └── metrics.py               ← F1, JSD, Frobenius, coverage
-│   ├── testing_v2/
-│   │   └── counterfactual_generator.py
-│   ├── demo/                        ← Benchmark case studies
-│   │   ├── autonomous_vehicle.py    ← AV CPS (9 states, 13 transitions)
-│   │   ├── ecommerce.py             ← E-commerce User + Admin models
-│   │   └── visualize.py             ← Matplotlib figure generation
-│   └── tests/                       ← Test suite (9 modules)
+├── nesy_mbst/                          — Core Python package
+│   ├── agent/                          — LLM integration layer
+│   │   ├── base_llm.py                 — BaseAgent (Azure OpenAI)
+│   │   ├── llm_adapter.py              — callable(str)→str adapter
+│   │   └── system_prompts.py           — Oracle & extractor prompts
+│   │
+│   ├── core/                           — Foundational data structures
+│   │   ├── state_machine.py            — DFA and MarkovChain
+│   │   └── observation_table.py        — L* observation table
+│   │
+│   ├── learning/                       — Active automata learning
+│   │   ├── lstar.py                    — L* learner (Angluin 1987)
+│   │   └── hierarchical.py             — Higher-order Markov chain
+│   │
+│   ├── neural/                         — Neural extraction layer
+│   │   ├── llm_oracle.py               — Grammar-constrained oracle
+│   │   └── constraint_extractor.py     — NL → constraint extraction
+│   │
+│   ├── symbolic/                       — Symbolic verification layer
+│   │   ├── feasibility_checker.py      — Transition guard enforcement
+│   │   ├── constraint_solver.py        — SLSQP max-entropy solver
+│   │   └── closed_loop.py              — Telemetry-driven recalibration
+│   │
+│   ├── testing/                        — Test generation & metrics
+│   │   ├── test_generator.py           — Statistical test suite generator
+│   │   └── metrics.py                  — F1, JSD, Frobenius, coverage
+│   │
+│   ├── demo/                           — Benchmark case studies
+│   │   ├── autonomous_vehicle.py       — AV CPS (9 states, 13 transitions)
+│   │   ├── ecommerce.py                — E-commerce User + Admin models
+│   │   └── visualize.py                — Figure generation helpers
+│   │
+│   ├── learning_v2/                    — Extended learning (v2)
+│   ├── neural_v2/                      — Extended neural (v2)
+│   ├── symbolic_v2/                    — Extended symbolic (v2)
+│   ├── testing_v2/                     — Extended testing (v2)
+│   │
+│   └── tests/                          — Test suite (9 modules)
 │       ├── test_core.py
 │       ├── test_lstar.py
 │       ├── test_oracle.py
@@ -105,38 +176,40 @@ llm-mbst-research/
 │       ├── test_integration.py
 │       └── test_v2_modules.py
 │
-├── latex/                           ← IEEE paper source (IEEEtran)
-│   ├── main.tex                     ← Root document
-│   ├── references.bib               ← 55 verified entries (CrossRef/arXiv)
-│   ├── Makefile                     ← pdflatex + bibtex build
+├── latex/                              — IEEE paper source (IEEEtran)
+│   ├── main.tex                        — Root document
+│   ├── references.bib                  — 55 verified entries (CrossRef/arXiv)
+│   ├── Makefile                        — pdflatex + bibtex build
+│   ├── main.pdf                        — Compiled paper
 │   └── sections/
 │       ├── abstract.tex
-│       ├── introduction.tex         ← Includes RQ1–RQ4
-│       ├── literature_review.tex    ← 20 papers + fault-detection subsection
+│       ├── introduction.tex            — Includes RQ1–RQ4 + paper roadmap
+│       ├── literature_review.tex       — 20 papers + fault-detection subsection
 │       ├── related_work.tex
 │       ├── bottlenecks.tex
 │       ├── framework.tex
 │       ├── mathematical_formulations.tex
-│       ├── evaluation.tex           ← Tables II–IV + fault-detection analysis
-│       ├── ablation.tex             ← Table V (conditions A–D)
-│       ├── threats.tex              ← Threats to validity
-│       └── conclusion.tex           ← Adoption guidelines + future work
+│       ├── evaluation.tex              — Tables II–IV + fault-detection analysis
+│       ├── ablation.tex                — Table V (conditions A–D)
+│       ├── threats.tex                 — Threats to validity
+│       └── conclusion.tex              — Adoption guidelines + future work
 │
-└── output/                          ← Generated artefacts (not committed)
-    ├── figures/                     ← Publication figures (PDF + PNG)
-    │   ├── fig1_f1_comparison.*
-    │   ├── fig2_ablation_f1.*
-    │   ├── fig3_divergence.*
-    │   ├── fig4_coverage.*
-    │   └── fig5_radar.*
-    └── autonomous_vehicle_cps_*/    ← AV demo output reports
+└── output/                             — Generated artefacts (git-ignored except figures)
+    └── figures/                        — Publication figures (committed)
+        ├── fig1_f1_comparison.pdf/.png
+        ├── fig2_ablation_f1.pdf/.png
+        ├── fig3_divergence.pdf/.png
+        ├── fig4_coverage.pdf/.png
+        └── fig5_radar.pdf/.png
 ```
+
+> **Note:** `scripts/` consolidates all entry-point scripts that were previously at the repo root. See [Installation](#installation) for path adjustments.
 
 ---
 
 ## Installation
 
-**Prerequisites:** Python ≥ 3.12 · Azure OpenAI API access (optional — simulator available)
+**Prerequisites:** Python ≥ 3.12 · Azure OpenAI API access *(optional — simulator available)*
 
 ### With `uv` (recommended)
 
@@ -166,21 +239,21 @@ AZURE_API_KEY=your-api-key
 AZURE_DEPLOYMENT=gpt-4.1-mini
 ```
 
-> **No API key?** All scripts fall back to a rule-based simulator — results are representative but use regex extraction rather than a live LLM.
+> **No API key?** All scripts fall back to a rule-based simulator — results use regex extraction rather than a live LLM.
 
 ---
 
 ## Reproducing Paper Results
 
-### Figure generation (all 5 paper figures)
+### All 5 publication figures
 
 ```bash
 python generate_figures.py
-# → output/figures/fig1_f1_comparison.pdf  (Table II bar chart)
-# → output/figures/fig2_ablation_f1.pdf    (ablation F1)
-# → output/figures/fig3_divergence.pdf     (JSD + Frobenius)
-# → output/figures/fig4_coverage.pdf       (coverage by condition)
-# → output/figures/fig5_radar.pdf          (multi-dimensional radar)
+# → output/figures/fig1_f1_comparison.pdf   F1 bar chart (Table II)
+# → output/figures/fig2_ablation_f1.pdf     Ablation F1 (Table V)
+# → output/figures/fig3_divergence.pdf      JSD + Frobenius
+# → output/figures/fig4_coverage.pdf        Coverage by condition
+# → output/figures/fig5_radar.pdf           Multi-dimensional radar
 ```
 
 ### Tables II–IV (evaluation section)
@@ -189,20 +262,18 @@ python generate_figures.py
 python run_evaluation.py
 ```
 
-### Table V (ablation study, RQ4)
+### Table V — ablation study (RQ4)
 
 ```bash
 python run_ablation.py
-# Fixed seed=42, Azure OpenAI backend (falls back to simulator)
-# Reports: Sys.F1, JSD, Frobenius, coverage for conditions A–D
+# Fixed seed=42 · Azure OpenAI backend · falls back to simulator
 ```
 
 ### Full pipeline demo
 
 ```bash
 python run_demo.py
-# Autonomous Vehicle CPS case study: 9 states, 13 transitions
-# Generates figures and a Markdown report in output/
+# AV CPS: 9 states, 13 transitions — outputs figures + Markdown report
 ```
 
 ### Test suite
@@ -213,67 +284,9 @@ python -m pytest nesy_mbst/tests/ -v
 
 ---
 
-## Framework Architecture
-
-NeSy-MBST separates concerns by computational capability: neural inference handles ambiguous language; symbolic computation handles formal correctness.
-
-```
-Natural Language Requirements
-           │
-           ▼
-  ┌─────────────────────┐
-  │  Neural Layer       │  LLM reads requirements, extracts candidate
-  │  (LLM Oracle)       │  states/transitions, answers membership queries
-  └────────┬────────────┘
-           │  {Yes / No / Unsure}
-           ▼
-  ┌─────────────────────┐
-  │  L* Active Learning │  Systematically explores state space via
-  │  Engine             │  membership + equivalence queries
-  └────────┬────────────┘
-           │  hypothesis automaton
-           ▼
-  ┌─────────────────────┐
-  │  Symbolic Feasibility│  Rejects transitions violating invariants,
-  │  Checker            │  preconditions, and guard conditions
-  └────────┬────────────┘
-           │  verified topology
-           ▼
-  ┌─────────────────────┐
-  │  Convex Optimizer   │  Assigns transition probabilities via SLSQP
-  │  (SLSQP)            │  under row-stochastic + domain constraints
-  └────────┬────────────┘
-           │  calibrated matrix P*
-           ▼
-  ┌─────────────────────┐
-  │  Markov Chain       │  Complete usage model → statistical test
-  │  Usage Model        │  suite generation
-  └────────┬────────────┘
-           │
-           ▼  (runtime telemetry)
-  ┌─────────────────────┐
-  │  Closed-Loop        │  Detects model drift, recalibrates
-  │  Adapter            │  transition probabilities continuously
-  └─────────────────────┘
-```
-
-### Key component map
-
-| Component | File | Role |
-|---|---|---|
-| Grammar-Constrained Oracle | `neural/llm_oracle.py` | Restricts LLM to `{Yes, No, Unsure}` |
-| L\* Learner | `learning/lstar.py` | Systematic DFA inference (Angluin 1987) |
-| Feasibility Checker | `symbolic/feasibility_checker.py` | Rule-based structural validation |
-| Convex Solver | `symbolic/constraint_solver.py` | scipy SLSQP, max-entropy objective |
-| Hierarchical Model | `learning/hierarchical.py` | Higher-order tree + first-order fallback |
-| Closed-Loop Adapter | `symbolic/closed_loop.py` | Telemetry-driven recalibration |
-| Metrics | `testing/metrics.py` | F1, JSD, Frobenius, coverage |
-
----
-
 ## Ablation Study Results
 
-Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
+Four cumulative conditions, AV CPS benchmark (seed=42):
 
 | Condition | Sys. F1 | Trans. Coverage | JSD | Frobenius |
 |---|:---:|:---:|:---:|:---:|
@@ -282,9 +295,9 @@ Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
 | C — +Convex Optimizer | 0.9818 | 85.7% | 0.012 | 0.084 |
 | D — Full NeSy-MBST | 0.9818 | 85.7% | **0.012** | **0.084** |
 
-**Symbolic loop** → primary driver of structural correctness and coverage (+35.7 pp).  
-**Convex optimizer** → primary driver of probabilistic calibration (JSD: 0.157 → 0.012).  
-**Closed-loop** → continuous fidelity maintenance over extended test campaigns.
+**Symbolic loop** → primary driver of structural correctness (+35.7 pp coverage).
+**Convex optimizer** → primary driver of probabilistic calibration (JSD: 0.157 → 0.012).
+**Closed-loop** → continuous fidelity maintenance over extended campaigns.
 
 ---
 
@@ -292,11 +305,11 @@ Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
 
 | Threat | Nature | Mitigation |
 |---|---|---|
-| Benchmark scope | 2 domains, max 42 states | Industrial case studies planned (see Future Work) |
-| Ground-truth annotation | Single-author | AV benchmark from formal spec; e-commerce tautological (disclosed in paper) |
-| Oracle consistency | Not formally proven | Empirically: 0% Unsure rate on AV benchmark; 94% direct / 6% SUT-escalated |
+| Benchmark scope | 2 domains, max 42 states | Industrial case studies planned |
+| Ground-truth annotation | Single-author | AV from formal spec; e-commerce limitation disclosed |
+| Oracle consistency | Not formally proven | 0% Unsure on AV; 94% direct / 6% SUT-escalated |
 | Statistical validity | Single seed (42) | Fully reproducible; multi-seed study in future work |
-| LLM provider | Azure GPT-4.1-mini only | Simulator fallback available; provider sensitivity in future work |
+| LLM provider dependency | Azure GPT-4.1-mini | Simulator fallback; provider sensitivity in future work |
 
 ---
 
@@ -304,14 +317,12 @@ Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
 
 ```bibtex
 @article{nesy_mbst_2026,
-  author       = {Nathan G. and Jordan Chay and Jaeden Ting YiYong
-                  and Wai Phyo Hein},
-  title        = {The Machine Proposes. The Proof Disposes.:
-                  Neuro-Symbolic Synthesis of Formally Verified
-                  {Markov} Usage Models from Natural Language Requirements},
-  journal      = {IEEE Transactions on Software Engineering},
-  year         = {2026},
-  note         = {Under review. Preprint: \url{https://github.com/nathangtg/llm-mbst-research}}
+  author  = {Nathan G. and Jordan Chay and Jaeden Ting YiYong and Wai Phyo Hein},
+  title   = {The Machine Proposes. The Proof Disposes.: Neuro-Symbolic Synthesis
+             of Formally Verified {Markov} Usage Models from Natural Language Requirements},
+  journal = {IEEE Transactions on Software Engineering},
+  year    = {2026},
+  note    = {Under review. \url{https://github.com/nathangtg/llm-mbst-research}}
 }
 ```
 
@@ -319,11 +330,11 @@ Four cumulative conditions on the Autonomous Vehicle CPS benchmark (seed=42):
 
 ## Future Work
 
-1. **Fault-seeding experiments** — directly measure defect-detection rates against planted fault corpora; validate the transition-coverage proxy against actual bug catch rates
-2. **Industrial case studies** — deploy on real codebases in automotive (ISO 26262), medical devices, and telecommunications
+1. **Fault-seeding experiments** — directly measure defect-detection rates; validate transition-coverage proxy against actual bug catch rates
+2. **Industrial case studies** — deploy on real codebases in automotive (ISO 26262), medical devices, telecommunications
 3. **Multi-annotator validation** — replace single-author ground truth with inter-rater reliability protocol
-4. **Domain generalisation** — evaluate on informally-written requirements (agile user stories, verbal specs)
-5. **Oracle sensitivity** — characterise how LLM provider, version, and temperature affect convergence and F1
+4. **Domain generalisation** — evaluate on informal requirements (agile user stories, verbal specs)
+5. **Oracle sensitivity** — characterise how LLM provider, version, and temperature affect convergence
 
 ---
 

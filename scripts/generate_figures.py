@@ -22,7 +22,7 @@ import matplotlib.patches as mpatches
 from matplotlib.patches import FancyArrowPatch
 import seaborn as sns
 
-OUT = os.path.join(os.path.dirname(__file__), "output", "figures")
+OUT = os.path.join(os.path.dirname(__file__), "..", "output", "figures")
 os.makedirs(OUT, exist_ok=True)
 
 sns.set_theme(style="whitegrid", font_scale=1.05)
