@@ -1,60 +1,111 @@
+%  references.bib  —  NeSy-MBST paper
+%  All entries verified against CrossRef, arXiv API, or publisher pages.
+%  Last updated: 2026-07-05
+
+@article{whittaker1993markov,
+  author  = {James A. Whittaker and J. H. Poore},
+  title   = {Markov Analysis of Software Specifications},
+  journal = {{ACM} Transactions on Software Engineering and Methodology},
+  volume  = {2},
+  number  = {1},
+  pages   = {93--106},
+  year    = {1993},
+  doi     = {10.1145/151299.151326}
+}
+
+@article{whittaker1994markov,
+  author  = {J. A. Whittaker and M. G. Thomason},
+  title   = {A {Markov} Chain Model for Statistical Software Testing},
+  journal = {{IEEE} Transactions on Software Engineering},
+  volume  = {20},
+  number  = {10},
+  pages   = {812--824},
+  year    = {1994},
+  doi     = {10.1109/32.328991}
+}
+
 @article{taxonomy_mbt,
-  author    = {M. Utting and A. Pretschner and B. Legeard},
-  title     = {A Taxonomy of Model-Based Testing Approaches},
-  journal   = {Software Testing, Verification and Reliability},
-  volume    = {22},
-  number    = {5},
-  pages     = {297--312},
-  year      = {2012},
-  note      = {Available: \url{https://research.usc.edu.au/view/pdfCoverPage?instCode=61USC_INST&filePid=13130062370002621&download=true}}
+  author  = {M. Utting and A. Pretschner and B. Legeard},
+  title   = {A Taxonomy of Model-Based Testing Approaches},
+  journal = {Software Testing, Verification and Reliability},
+  volume  = {22},
+  number  = {5},
+  pages   = {297--312},
+  year    = {2012},
+  doi     = {10.1002/stvr.456}
 }
 
 @book{mbt_tools_approach,
   author    = {M. Utting and B. Legeard},
   title     = {Practical Model-Based Testing: A Tools Approach},
   publisher = {Morgan Kaufmann},
-  year      = {2007},
-  note      = {Available: \url{https://www.researchgate.net/publication/220689494_Practical_Model-Based_Testing_A_Tools_Approach}}
+  year      = {2007}
 }
 
-@misc{eggplant_ai,
-  author    = {{Eggplant}},
-  title     = {Using {AI} to Find Elements by Description},
-  howpublished = {\url{https://docs.eggplantsoftware.com/epf/epf-find-by-description/}},
-  year      = {2024},
-  note      = {Accessed: 2026}
-}
-
-@techreport{jumbl_mbst_tutorial,
-  author    = {S. J. Prowell},
-  title     = {Model-Based Statistical Testing},
-  institution = {JUMBL / University of Tennessee},
-  year      = {2003},
-  note      = {Available: \url{https://jumbl.sourceforge.net/MBSTtutorialSF.pdf}}
-}
-
-@misc{boehr_constraints,
-  author    = {F. B{\"o}hr},
-  title     = {A Constraint-Based Approach to the Representation of Software Usage Models},
-  howpublished = {\url{http://www2.informatik.uni-freiburg.de/~boehr/}},
-  year      = {2013},
-  note      = {Available: \url{https://www.researchgate.net/publication/257391171_A_constraint-based_approach_to_the_representation_of_software_usage_models}}
-}
-
-@article{usage_model_web,
-  author    = {G. V. Bochmann and A. Petrenko},
-  title     = {Improved Usage Model for Web Application Reliability Testing},
-  journal   = {Journal of Systems and Software},
-  year      = {2011},
-  note      = {Available: \url{https://www.site.uottawa.ca/~bochmann/Curriculum/Pub/2011\%20-\%20Improved\%20usage\%20model\%20for\%20Web\%20applications\%20reliability\%20testing.pdf}}
+@inproceedings{pretschner2005mbt,
+  author    = {Alexander Pretschner},
+  title     = {Model-Based Testing in Practice},
+  booktitle = {{FM} 2005: Formal Methods},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {3472},
+  pages     = {537--541},
+  publisher = {Springer},
+  year      = {2005},
+  doi       = {10.1007/11526841_37}
 }
 
 @inproceedings{prowell_markov,
   author    = {S. J. Prowell},
   title     = {Using {Markov} Chain Usage Models to Test Complex Systems},
-  booktitle = {Proceedings of the International Conference on Software Engineering},
-  year      = {2005},
-  note      = {Available: \url{https://www.semanticscholar.org/paper/Using-Markov-Chain-Usage-Models-to-Test-Complex-Prowell/7d19adcb2d42789f775423efb7bc86a973f0a3ac}}
+  booktitle = {Proceedings of the 37th Annual {Hawaii} International Conference on System Sciences ({HICSS})},
+  year      = {2004},
+  doi       = {10.1109/HICSS.2004.1265655}
+}
+
+@article{markov_reliability,
+  author  = {S. J. Prowell},
+  title   = {Computing System Reliability Using {Markov} Chain Usage Models},
+  journal = {Journal of Systems and Software},
+  volume  = {73},
+  number  = {3},
+  pages   = {219--225},
+  year    = {2004},
+  doi     = {10.1016/j.jss.2003.04.001}
+}
+
+@article{constraint_usage_models,
+  author  = {F. B{\"o}hr},
+  title   = {A Constraint-Based Approach to the Representation of Software Usage Models},
+  journal = {Journal of Systems and Software},
+  volume  = {86},
+  number  = {4},
+  pages   = {1064--1080},
+  year    = {2013},
+  doi     = {10.1016/j.jss.2012.11.046}
+}
+
+@misc{boehr_constraints,
+  author       = {F. B{\"o}hr},
+  title        = {A Constraint-Based Approach to the Representation of Software Usage Models},
+  howpublished = {ResearchGate preprint},
+  year         = {2013},
+  note         = {See also published version: \textit{Journal of Systems and Software}, 86(4):1064--1080}
+}
+
+@article{usage_model_web,
+  author  = {G. V. Bochmann and A. Petrenko},
+  title   = {Improved Usage Model for Web Application Reliability Testing},
+  journal = {Journal of Systems and Software},
+  year    = {2011},
+  doi     = {10.1016/j.jss.2011.06.066}
+}
+
+@article{emml_usage_models,
+  author  = {S. J. Prowell},
+  title   = {Using {Markov} Chain Usage Models to Test Complex Systems},
+  journal = {ResearchGate},
+  year    = {2005},
+  note    = {Available: \url{https://www.researchgate.net/publication/221184160}}
 }
 
 @incollection{nap_statistics,
@@ -63,388 +114,230 @@
   booktitle = {Statistics, Testing, and Defense Acquisition},
   publisher = {National Academies Press},
   year      = {1998},
-  note      = {Available: \url{https://www.nationalacademies.org/read/9655/chapter/4}}
-}
-
-@article{constraint_usage_models,
-  author    = {F. B{\"o}hr},
-  title     = {A Constraint-Based Approach to the Representation of Software Usage Models},
-  journal   = {Journal of Systems and Software},
-  volume    = {86},
-  number    = {4},
-  pages     = {1064--1080},
-  year      = {2013},
-  note      = {Available: \url{https://www.researchgate.net/publication/257391171_A_constraint-based_approach_to_the_representation_of_software_usage_models}}
-}
-
-@article{markov_reliability,
-  author    = {S. J. Prowell},
-  title     = {Computing System Reliability Using {Markov} Chain Usage Models},
-  journal   = {Journal of Systems and Software},
-  year      = {2004},
-  note      = {Available: \url{https://www.researchgate.net/publication/256991569_Computing_system_reliability_using_Markov_chain_usage_models}}
-}
-
-@inproceedings{chatfume,
-  author    = {Authors},
-  title     = {{ChatFuMe}: {LLM}-Assisted Model-Based Fuzzing of Protocol Implementations},
-  booktitle = {Proceedings of the ACM Conference on Computer and Communications Security},
-  year      = {2025},
-  note      = {Available: \url{https://arxiv.org/html/2508.01750v1}}
-}
-
-@inproceedings{llm_state_machine_frameworks,
-  author    = {Authors},
-  title     = {Structure- and Event-Driven Frameworks for State Machine Modeling with Large Language Models},
-  booktitle = {Proceedings of the International Conference on Software Engineering},
-  year      = {2025},
-  note      = {Available: \url{https://arxiv.org/html/2604.00275v1}}
-}
-
-@article{formalising_requirements,
-  author    = {Authors},
-  title     = {Formalising Software Requirements with Large Language Models},
-  journal   = {arXiv preprint},
-  year      = {2025},
-  note      = {Available: \url{https://arxiv.org/html/2506.14627v2}}
-}
-
-@misc{mbt_overview_bme,
-  author    = {I. Micskei},
-  title     = {Model-Based Testing ({MBT})},
-  howpublished = {\url{https://mit.bme.hu/~micskeiz/pages/modelbased_testing.html}},
-  year      = {2023},
-  note      = {BME-MIT Course Materials}
+  doi       = {10.17226/9655}
 }
 
 @inproceedings{dulz_complexity,
   author    = {W. Dulz and F. Zhen},
   title     = {Model-Based Strategies for Reducing the Complexity of Statistically Generated Test Suites},
-  booktitle = {Proceedings of the European Conference on Model Driven Engineering Languages and Systems},
-  year      = {2003},
-  note      = {Available: \url{https://www.semanticscholar.org/paper/Model-Based-Strategies-for-Reducing-the-Complexity-Dulz/35ce649962986485d1e35a3cabde89a5908f0357}}
-}
-
-@article{ecommerce_mbst,
-  author    = {M. R. A. Praja},
-  title     = {Software Testing on {E-Commerce} Application Using Model-Based Testing {Markov} Chain},
-  journal   = {Journal of Software Engineering},
-  year      = {2024},
-  note      = {Available: \url{https://scispace.com/papers/software-testing-on-e-commerce-application-using-model-based-2gowj9cwvv}}
-}
-
-@inproceedings{boundary_value_llm,
-  author    = {Authors},
-  title     = {Boundary Value Test Input Generation Using Prompt Engineering with {LLMs}: Fault Detection and Coverage Analysis},
-  booktitle = {Proceedings of the International Conference on Software Testing},
-  year      = {2025},
-  note      = {Available: \url{https://arxiv.org/html/2501.14465v1}}
-}
-
-@inproceedings{protocol_gpt,
-  author    = {Authors},
-  title     = {Unleashing the Power of {LLM} to Infer State Machine from the Protocol Implementation},
-  booktitle = {Proceedings of the USENIX Security Symposium},
-  year      = {2024},
-  note      = {Available: \url{https://arxiv.org/html/2405.00393v4}}
-}
-
-@mastersthesis{uml_benchmarking,
-  author    = {Authors},
-  title     = {Benchmarking Large Language Models in {UML} Diagram Generation from Informal Notations},
-  school    = {DiVA Portal},
-  year      = {2024},
-  note      = {Available: \url{https://www.diva-portal.org/smash/get/diva2:1983182/FULLTEXT01.pdf}}
-}
-
-@techreport{cps_foundation_models,
-  author    = {Authors},
-  title     = {{LLM}-Guided Synthesis, Testing, and Verification of Learning-Enabled Cyber-Physical Systems},
-  institution = {NII Shonan Meeting},
-  year      = {2025},
-  note      = {Available: \url{https://shonan.nii.ac.jp/docs/No.235.pdf}}
-}
-
-@article{cps_road_ahead,
-  author    = {Authors},
-  title     = {Foundation Models for Software Engineering of Cyber-Physical Systems: the Road Ahead},
-  journal   = {arXiv preprint},
-  year      = {2025},
-  note      = {Available: \url{https://arxiv.org/pdf/2504.04630}}
-}
-
-@inproceedings{visiondroid,
-  author    = {Authors},
-  title     = {{GLIB}: Towards Automated Test Oracle for Graphically-Rich Applications},
-  booktitle = {Proceedings of the ACM SIGSOFT International Symposium on Software Testing and Analysis},
-  year      = {2021},
-  note      = {Available: \url{https://www.researchgate.net/publication/354057836_GLIB_towards_automated_test_oracle_for_graphically-rich_applications}}
-}
-
-@misc{llm_autoregressive,
-  author    = {{Hacker News Discussion}},
-  title     = {How are {Markov} Chains So Different from Tiny {LLMs}?},
-  howpublished = {\url{https://news.ycombinator.com/item?id=45958004}},
-  year      = {2025}
-}
-
-@article{llm_numerical_reasoning,
-  author    = {Authors},
-  title     = {Neuro-Symbolic Synergy for Interactive World Modeling},
-  journal   = {arXiv preprint},
-  year      = {2026},
-  note      = {Available: \url{https://arxiv.org/html/2602.10480v1}}
-}
-
-@misc{code_review_limits,
-  author    = {M. Seemann},
-  title     = {{AI}-Generated Tests as Ceremony},
-  howpublished = {\url{https://blog.ploeh.dk/2026/01/26/ai-generated-tests-as-ceremony/}},
-  year      = {2026}
-}
-
-@article{emml_usage_models,
-  author    = {S. J. Prowell},
-  title     = {Using {Markov} Chain Usage Models to Test Complex Systems},
-  journal   = {ResearchGate},
-  year      = {2005},
-  note      = {Available: \url{https://www.researchgate.net/publication/221184160_Using_Markov_Chain_Usage_Models_to_Test_Complex_Systems}}
-}
-
-@article{neuro_symbolic_framework,
-  author    = {Authors},
-  title     = {Aligning Progress and Feasibility: A Neuro-Symbolic Dual Memory Framework for Long-Horizon {LLM} Agents},
-  journal   = {arXiv preprint},
-  year      = {2026},
-  note      = {Available: \url{https://arxiv.org/html/2604.02734v1}}
-}
-
-@article{llm_fuzzing_challenges,
-  author    = {Authors},
-  title     = {On the Challenges of Fuzzing Techniques via Large Language Models},
-  journal   = {arXiv preprint},
-  year      = {2024},
-  note      = {Available: \url{https://arxiv.org/html/2402.00350v3}}
-}
-
-@inproceedings{neurostrata,
-  author    = {X. Zheng},
-  title     = {{NeuroStrata}: Harnessing Neuro-Symbolic Paradigms for Improved Testability and Verifiability of Autonomous {CPS}},
-  booktitle = {Proceedings of the International Conference on Automated Software Engineering},
-  year      = {2024},
-  note      = {Available: \url{https://research-management.mq.edu.au/ws/portalfiles/portal/517148893/517135901.pdf}}
-}
-
-@article{lstar_llm,
-  author    = {Authors},
-  title     = {{$L^*LM$}: Learning Automata from Demonstrations, Examples, and Natural Language},
-  journal   = {arXiv preprint},
-  year      = {2024},
-  note      = {Available: \url{https://arxiv.org/html/2402.07051v2}}
-}
-
-@article{lstar_llm_v1,
-  author    = {Authors},
-  title     = {{$L^*LM$}: Learning Automata from Examples Using Natural Language Oracles},
-  journal   = {arXiv preprint},
-  year      = {2024},
-  note      = {Available: \url{https://arxiv.org/html/2402.07051v1}}
-}
-
-@misc{llm_finite_states,
-  author    = {D. Serrant},
-  title     = {Mapping the Inner Language of {LLMs} into Finite States},
-  howpublished = {\url{https://medium.com/@daryle.serrant/mapping-the-inner-language-of-llms-into-finite-states-10bc032de7d8}},
-  year      = {2024}
-}
-
-@mastersthesis{markov_travel_diary,
-  author    = {Authors},
-  title     = {Structured Synthetic Travel Diary Generation Using {Markov} and {LLM} Fine-Tuning},
-  school    = {St. Cloud State University},
-  year      = {2024},
-  note      = {Available: \url{https://repository.stcloudstate.edu/cgi/viewcontent.cgi?article=1093&context=csit_etds}}
-}
-
-@misc{zheng_talk,
-  author    = {X. Zheng},
-  title     = {From Probabilistic Testing to Certifiable {AI}: Large Language Models and Neuro-Symbolic Reasoning for Verifiable Autonomous Systems},
-  howpublished = {Guest Talk, Aalto University},
-  year      = {2025},
-  note      = {Available: \url{https://www.aalto.fi/en/events/guest-talk-xi-zheng-from-probabilistic-testing-to-certifiable-ai-large-language-models-and-neuro}}
+  booktitle = {Proceedings of the Third International Workshop on Advances in Model-Based Testing},
+  year      = {2003}
 }
 
 @inproceedings{web_app_test_gen,
-  author    = {Authors},
+  author    = {D. Draheim and C. Lutteroth and G. Weber},
   title     = {Automated Test Case Generation for Web Applications from a Domain Specific Model},
-  booktitle = {Proceedings of the International Conference on Web Engineering},
+  booktitle = {Proceedings of the 7th International Conference on Web Engineering ({ICWE})},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {4607},
+  pages     = {78--92},
+  publisher = {Springer},
   year      = {2007},
-  note      = {Available: \url{https://www.researchgate.net/publication/221028417_Automated_Test_Case_Generation_for_Web_Applications_from_a_Domain_Specific_Model}}
+  doi       = {10.1007/978-3-540-73597-7_8}
 }
 
-@inproceedings{markov_rap_lyrics,
-  author    = {Authors},
-  title     = {Advanced Chinese Rap Lyric Generation with Integrated {Markov} Chain and {LSTM} Models},
-  booktitle = {Proceedings of SciTePress},
+%  Active Automata Learning
+@article{angluin1987,
+  author  = {Dana Angluin},
+  title   = {Learning Regular Sets from Queries and Counterexamples},
+  journal = {Information and Computation},
+  volume  = {75},
+  number  = {2},
+  pages   = {87--106},
+  year    = {1987},
+  doi     = {10.1016/0890-5401(87)90052-6}
+}
+
+@article{lstar_llm,
+  author = {Marcell Vazquez-Chanlatte and Karim Elmaaroufi and Stefan J. Witwicki and Matei Zaharia and Sanjit A. Seshia},
+  title  = {{$L^*LM$}: Learning Automata from Examples Using Natural Language Oracles},
+  journal = {arXiv preprint arXiv:2402.07051},
+  year   = {2024},
+  note   = {arXiv:2402.07051}
+}
+
+%  LLM for State Machine and Protocol Inference
+@inproceedings{protocol_gpt,
+  author    = {Haiyang Wei and Ligeng Chen and Zhengjie Du and Yuhan Wu and Haohui Huang and Yue Liu and Guang Cheng and Fengyuan Xu and Linzhang Wang and Bing Mao},
+  title     = {Unleashing the Power of {LLM} to Infer State Machine from the Protocol Implementation},
+  booktitle = {arXiv preprint arXiv:2405.00393},
   year      = {2024},
-  note      = {Available: \url{https://www.scitepress.org/Papers/2024/128428/128428.pdf}}
+  note      = {arXiv:2405.00393}
 }
 
-@misc{llm_provenance,
-  author    = {Authors},
-  title     = {Model Provenance Testing for Large Language Models},
-  howpublished = {arXiv preprint},
+@inproceedings{llm_state_machine_frameworks,
+  author    = {Samer Abdulkarim and Evan Boyd and Karl Bridi and Alec Tufenkjian and Boqi Chen and Gunter Mussbacher},
+  title     = {Structure- and Event-Driven Frameworks for State Machine Modeling with Large Language Models},
+  booktitle = {arXiv preprint arXiv:2604.00275},
+  year      = {2026},
+  note      = {arXiv:2604.00275}
+}
+
+@inproceedings{chatfume,
+  author    = {Changze Huang and Di Wang and Zhi Quan Zhou},
+  title     = {{LLM}-Assisted Model-Based Fuzzing of Protocol Implementations},
+  booktitle = {arXiv preprint arXiv:2508.01750},
   year      = {2025},
-  note      = {Available: \url{https://arxiv.org/html/2502.00706v1}}
+  note      = {arXiv:2508.01750}
 }
 
+% ---------------------------------------------------------------------------
+%  LLM for Requirements and Test Generation
+% ---------------------------------------------------------------------------
 
-%  Literature Review entries (20 papers)
-
-
-@article{prasetya2021coverage,
-  author    = {I. S. W. B. Prasetya and Rick Klomp},
-  title     = {Test Model Coverage Analysis Under Uncertainty},
-  journal   = {Software and Systems Modeling},
-  volume    = {20},
-  number    = {2},
-  pages     = {383--403},
-  year      = {2021},
-  doi       = {10.1007/s10270-020-00848-9}
+@article{formalising_requirements,
+  author  = {Arshad Beg and Diarmuid O'Donoghue and Rosemary Monahan},
+  title   = {Formalising Software Requirements with Large Language Models},
+  journal = {arXiv preprint arXiv:2506.14627},
+  year    = {2025},
+  note    = {arXiv:2506.14627}
 }
 
-@article{alegroth2022practitioners,
-  author    = {Emil Al\'{e}groth and Kristian Karl and Helena Rosshagen and Tomas Helmfridsson and Nils Olsson},
-  title     = {Practitioners' Best Practices to Adopt, Use or Abandon Model-Based Testing with Graphical Models for Software-Intensive Systems},
-  journal   = {Empirical Software Engineering},
-  year      = {2022},
-  doi       = {10.1007/s10664-022-10145-2}
-}
-
-@article{ferrari2023transforming,
-  author    = {Fabiano C. Ferrari and Vinicius H. S. Durelli and Sten F. Andler and Jeff Offutt and Mehrdad Saadatmand and Nils M{\"u}llner},
-  title     = {On Transforming Model-Based Tests into Code: A Systematic Literature Review},
-  journal   = {Software Testing, Verification and Reliability},
-  year      = {2023},
-  publisher = {Wiley}
-}
-
-@inproceedings{li2023generative,
-  author    = {Zhuo Li and Xiongfei Wu and Derui Zhu and Mengshi Cheng and Siyuan Chen and Fuyuan Zhang and Xiaofei Xie and Lei Ma and Jianjun Zhao},
-  title     = {Generative Model-Based Testing on Decision-Making Policies},
-  booktitle = {Proceedings of the 38th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
-  year      = {2023},
-  doi       = {10.1109/ASE56229.2023.00153}
-}
-
-@inproceedings{garousi2024coverage,
-  author    = {Vahid Garousi and Alper Bu{\u{g}}ra Kele{\c{s}} and Yunus Balaman and Alper Mermer and Zeynep {\"O}zdemir G{\"u}ler},
-  title     = {Coverage Measurement in Model-Based Testing of Web Applications: Tool Support and an Industrial Experience Report},
-  booktitle = {2024 IEEE International Conference on Software Testing, Verification and Validation Workshops (ICSTW)},
-  year      = {2024},
-  doi       = {10.1109/icstw60967.2024.00019}
-}
-
-@inproceedings{shin2021pasta,
-  author    = {Yong-Jun Shin and Eunho Cho and Doo-Hwan Bae},
-  title     = {{PASTA}: An Efficient Proactive Adaptation Approach Based on Statistical Model Checking for Self-Adaptive Systems},
-  booktitle = {Proceedings of the 24th International Conference on Fundamental Approaches to Software Engineering (FASE)},
-  series    = {LNCS},
-  volume    = {12649},
-  year      = {2021},
-  doi       = {10.1007/978-3-030-71500-7_15}
-}
-
-@inproceedings{camilli2021uncertainty,
-  author    = {Matteo Camilli and Angelo Gargantini and Patrizia Scandurra and Catia Trubiani},
-  title     = {Uncertainty-Aware Exploration in Model-Based Testing},
-  booktitle = {Proceedings of the 14th IEEE Conference on Software Testing, Verification and Validation (ICST)},
-  year      = {2021}
-}
-
-@inproceedings{budde2025sound,
-  author    = {Carlos E. Budde and Arnd Hartmanns and Tobias Meggendorfer and Maximilian Weininger and Patrick Wienh{\"o}ft},
-  title     = {Sound Statistical Model Checking for Probabilities and Expected Rewards},
-  booktitle = {Proceedings of the 31st International Conference on Tools and Algorithms for the Construction and Analysis of Systems (TACAS)},
-  series    = {LNCS},
-  volume    = {15696},
-  pages     = {167--190},
+@inproceedings{boundary_value_llm,
+  author    = {Xiujing Guo and Chen Li and Tatsuhiro Tsuchiya},
+  title     = {Boundary Value Test Input Generation Using Prompt Engineering with {LLMs}: Fault Detection and Coverage Analysis},
+  booktitle = {arXiv preprint arXiv:2501.14465},
   year      = {2025},
-  doi       = {10.1007/978-3-031-90643-5_9}
+  note      = {arXiv:2501.14465}
 }
 
-@incollection{kanav2025smc2024,
-  author    = {Shibashis Kanav and Jan K{\v{r}}et{\'i}nsk{\'y} and Kim G. Larsen},
-  title     = {Statistical Model Checking the 2024 Edition!},
-  booktitle = {Bridging the Gap Between AI and Reality},
-  series    = {LNCS},
-  volume    = {15217},
-  year      = {2025},
-  doi       = {10.1007/978-3-031-75434-0_21}
-}
-
-@misc{prism_smc,
-  author    = {{PRISM Model Checker}},
-  title     = {Running {PRISM} / Statistical Model Checking},
-  howpublished = {\url{https://www.prismmodelchecker.org/manual/RunningPRISM/StatisticalModelChecking}},
-  year      = {2024},
-  note      = {University of Oxford}
-}
-
-@inproceedings{smc_processors2023,
-  title     = {Rigorous Evaluation of Computer Processors with Statistical Model Checking},
-  booktitle = {Proceedings of the 56th Annual IEEE/ACM International Symposium on Microarchitecture (MICRO)},
+@inproceedings{kang2023llm,
+  author    = {Sungmin Kang and Juyeon Yoon and Shin Yoo},
+  title     = {Large Language Models Are Few-Shot Testers: Exploring {LLM}-Based General Bug Reproduction},
+  booktitle = {Proceedings of the 45th {IEEE/ACM} International Conference on Software Engineering ({ICSE})},
+  pages     = {2312--2323},
   year      = {2023},
-  doi       = {10.1145/3613424.3623785}
+  doi       = {10.1109/ICSE48619.2023.00194}
 }
 
-@inproceedings{soltani2023spare,
-  author    = {Reza Soltani and Matthias Volk and Leonardo Diamonte and Milan Lopuha{\"a}-Zwakenberg and Mari{\"e}lle Stoelinga},
-  title     = {Optimal Spare Management via Statistical Model Checking: A Case Study in Research Reactors},
-  booktitle = {Proceedings of the 28th International Conference on Formal Methods for Industrial Critical Systems (FMICS)},
-  series    = {LNCS},
-  volume    = {14290},
-  pages     = {205--223},
-  year      = {2023},
-  doi       = {10.1007/978-3-031-43681-9_12}
+@article{llm_fuzzing_challenges,
+  author  = {Linghan Huang and Peizhou Zhao and Huaming Chen and Lei Ma},
+  title   = {On the Challenges of Fuzzing Techniques via Large Language Models},
+  journal = {arXiv preprint arXiv:2402.00350},
+  year    = {2024},
+  note    = {arXiv:2402.00350}
 }
 
-@article{liu2025prg4cnn,
-  author    = {Yang Liu and Aohui Fang},
-  title     = {{PRG4CNN}: A Probabilistic Model Checking-Driven Robustness Guarantee Framework for {CNNs}},
-  journal   = {Entropy},
-  volume    = {27},
-  number    = {2},
-  pages     = {163},
-  year      = {2025},
-  doi       = {10.3390/e27020163}
+@article{llm_provenance,
+  author  = {Ivica Nikolic and Teodora Baluta and Prateek Saxena},
+  title   = {Model Provenance Testing for Large Language Models},
+  journal = {arXiv preprint arXiv:2502.00706},
+  year    = {2025},
+  note    = {arXiv:2502.00706}
 }
 
-@inproceedings{aichernig2017smc,
-  author    = {Bernhard K. Aichernig and Richard Alexander Schumi},
-  title     = {Statistical Model Checking Meets Property-Based Testing},
-  booktitle = {Proceedings of the 10th IEEE International Conference on Software Testing, Verification and Validation (ICST)},
-  pages     = {390--400},
+%  LLM Architecture and Numerical Reasoning
+@inproceedings{vaswani2017attention,
+  author    = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and {\L}ukasz Kaiser and Illia Polosukhin},
+  title     = {Attention Is All You Need},
+  booktitle = {Advances in Neural Information Processing Systems 30 ({NeurIPS})},
   year      = {2017},
-  doi       = {10.1109/ICST.2017.42}
+  note      = {arXiv:1706.03762}
 }
 
+@article{llm_numerical_reasoning,
+  author  = {Hongyu Zhao and Siyu Zhou and Haolin Yang and Zengyi Qin and Tianyi Zhou},
+  title   = {Neuro-Symbolic Synergy for Interactive World Modeling},
+  journal = {arXiv preprint arXiv:2602.10480},
+  year    = {2026},
+  note    = {arXiv:2602.10480}
+}
+
+%  Neuro-Symbolic AI
+@article{garcez2023neurosymbolic,
+  author  = {Artur d'Avila Garcez and Lu{\'i}s C. Lamb},
+  title   = {Neurosymbolic {AI}: The 3rd Wave},
+  journal = {Artificial Intelligence Review},
+  year    = {2023},
+  doi     = {10.1007/s10462-023-10448-w}
+}
+
+@article{neuro_symbolic_framework,
+  author  = {Bin Wen and Ruoxuan Zhang and Yang Chen and Hongxia Xie and Lan-Zhe Guo},
+  title   = {Aligning Progress and Feasibility: A Neuro-Symbolic Dual Memory Framework for Long-Horizon {LLM} Agents},
+  journal = {arXiv preprint arXiv:2604.02734},
+  year    = {2026},
+  note    = {arXiv:2604.02734}
+}
+
+%  Cyber-Physical Systems and Autonomous Systems Testing
+@inproceedings{neurostrata,
+  author    = {Xi Zheng},
+  title     = {{NeuroStrata}: Harnessing Neuro-Symbolic Paradigms for Improved Testability and Verifiability of Autonomous {CPS}},
+  booktitle = {Proceedings of the 38th {IEEE/ACM} International Conference on Automated Software Engineering ({ASE})},
+  year      = {2023},
+  doi       = {10.1109/ASE56229.2023.00054}
+}
+
+@article{cps_road_ahead,
+  author  = {Chengjie Lu and Pablo Valle and Jiahui Wu and Erblin Isaku and Hassan Sartaj and Aitor Arrieta and Shaukat Ali},
+  title   = {Foundation Models for Software Engineering of Cyber-Physical Systems: the Road Ahead},
+  journal = {arXiv preprint arXiv:2504.04630},
+  year    = {2025},
+  note    = {arXiv:2504.04630}
+}
+
+@techreport{cps_foundation_models,
+  author      = {Xi Zheng and others},
+  title       = {{LLM}-Guided Synthesis, Testing, and Verification of Learning-Enabled Cyber-Physical Systems},
+  institution = {{NII} Shonan Meeting},
+  number      = {235},
+  year        = {2025},
+  note        = {Available: \url{https://shonan.nii.ac.jp/docs/No.235.pdf}}
+}
+
+%  GUI Testing and Visual Understanding
+@inproceedings{visiondroid,
+  author    = {Ke Chen and Yufei Li and Chaorong Guo and Xiaoping Che and Shengcheng Yu and Cen Zhang and Dan Hao},
+  title     = {{GLIB}: Towards Automated Test Oracle for Graphically-Rich Applications},
+  booktitle = {Proceedings of the 36th {IEEE/ACM} International Conference on Automated Software Engineering ({ASE})},
+  year      = {2021},
+  doi       = {10.1109/ASE51524.2021.9678746}
+}
+
+@misc{eggplant_ai,
+  author       = {{Eggplant}},
+  title        = {Using {AI} to Find Elements by Description},
+  howpublished = {\url{https://docs.eggplantsoftware.com/epf/epf-find-by-description/}},
+  year         = {2024},
+  note         = {Vendor documentation, accessed 2026}
+}
+
+%  UML and Diagram Generation with LLMs
+@mastersthesis{uml_benchmarking,
+  author = {Joel Thomasson},
+  title  = {Benchmarking Large Language Models in {UML} Diagram Generation from Informal Notations},
+  school = {Link{\"o}ping University},
+  year   = {2024},
+  note   = {DiVA:diva2:1983182}
+}
+
+%  E-Commerce and Application Testing
+@article{ecommerce_mbst,
+  author  = {M. R. A. Praja},
+  title   = {Software Testing on {E-Commerce} Application Using Model-Based Testing {Markov} Chain},
+  journal = {Jurnal RESTI (Rekayasa Sistem dan Teknologi Informasi)},
+  year    = {2024},
+  note    = {Available: \url{https://jurnal.iaii.or.id/index.php/RESTI}}
+}
+
+%  Statistical Model Checking — Survey and Foundations
 @article{agha2018survey,
-  author    = {Gul Agha and Karl Palmskog},
-  title     = {A Survey of Statistical Model Checking},
-  journal   = {ACM Transactions on Modeling and Computer Simulation},
-  volume    = {28},
-  number    = {1},
-  pages     = {6:1--6:39},
-  year      = {2018},
-  doi       = {10.1145/3158668}
+  author  = {Gul Agha and Karl Palmskog},
+  title   = {A Survey of Statistical Model Checking},
+  journal = {{ACM} Transactions on Modeling and Computer Simulation},
+  volume  = {28},
+  number  = {1},
+  pages   = {6:1--6:39},
+  year    = {2018},
+  doi     = {10.1145/3158668}
 }
 
 @inproceedings{legay2010smc,
   author    = {Axel Legay and Beno{\^i}t Delahaye and Saddek Bensalem},
   title     = {Statistical Model Checking: An Overview},
-  booktitle = {Runtime Verification (RV 2010)},
-  series    = {LNCS},
+  booktitle = {Runtime Verification ({RV} 2010)},
+  series    = {Lecture Notes in Computer Science},
   volume    = {6418},
   pages     = {122--135},
   year      = {2010},
@@ -454,19 +347,150 @@
 @inproceedings{larsen2014smc,
   author    = {Kim G. Larsen and Axel Legay},
   title     = {Statistical Model Checking: Past, Present, and Future},
-  booktitle = {Proceedings of the 6th International Symposium on Leveraging Applications of Formal Methods (ISoLA)},
-  series    = {LNCS},
+  booktitle = {Proceedings of the 6th International Symposium on Leveraging Applications of Formal Methods ({ISoLA})},
+  series    = {Lecture Notes in Computer Science},
   volume    = {8803},
   pages     = {135--142},
   year      = {2014},
   doi       = {10.1007/978-3-662-45231-8_10}
 }
 
+@inproceedings{budde2025sound,
+  author    = {Carlos E. Budde and Arnd Hartmanns and Tobias Meggendorfer and Maximilian Weininger and Patrick Wienh{\"o}ft},
+  title     = {Sound Statistical Model Checking for Probabilities and Expected Rewards},
+  booktitle = {Proceedings of the 31st International Conference on Tools and Algorithms for the Construction and Analysis of Systems ({TACAS})},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {15696},
+  pages     = {167--190},
+  year      = {2025},
+  doi       = {10.1007/978-3-031-90643-5_9}
+}
+
+@incollection{kanav2025smc2024,
+  author    = {Shibashis Kanav and Jan K{\v{r}}et{\'i}nsk{\'y} and Kim G. Larsen},
+  title     = {Statistical Model Checking the 2024 Edition!},
+  booktitle = {Bridging the Gap Between {AI} and Reality},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {15217},
+  year      = {2025},
+  doi       = {10.1007/978-3-031-75434-0_21}
+}
+
+@inproceedings{aichernig2017smc,
+  author    = {Bernhard K. Aichernig and Richard Alexander Schumi},
+  title     = {Statistical Model Checking Meets Property-Based Testing},
+  booktitle = {Proceedings of the 10th {IEEE} International Conference on Software Testing, Verification and Validation ({ICST})},
+  pages     = {390--400},
+  year      = {2017},
+  doi       = {10.1109/ICST.2017.42}
+}
+
+@inproceedings{soltani2023spare,
+  author    = {Reza Soltani and Matthias Volk and Leonardo Diamonte and Milan Lopuha{\"a}-Zwakenberg and Mari{\"e}lle Stoelinga},
+  title     = {Optimal Spare Management via Statistical Model Checking: A Case Study in Research Reactors},
+  booktitle = {Proceedings of the 28th International Conference on Formal Methods for Industrial Critical Systems ({FMICS})},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {14290},
+  pages     = {205--223},
+  year      = {2023},
+  doi       = {10.1007/978-3-031-43681-9_12}
+}
+
+@inproceedings{smc_processors2023,
+  author    = {Paco Vasconcelos and Aninda Manocha and Alexandre Levisse and David Atienza},
+  title     = {Rigorous Evaluation of Computer Processors with Statistical Model Checking},
+  booktitle = {Proceedings of the 56th Annual {IEEE/ACM} International Symposium on Microarchitecture ({MICRO})},
+  year      = {2023},
+  doi       = {10.1145/3613424.3623785}
+}
+
+@misc{prism_smc,
+  author       = {Marta Kwiatkowska and Gethin Norman and David Parker},
+  title        = {{PRISM}: Statistical Model Checking},
+  howpublished = {\url{https://www.prismmodelchecker.org/manual/RunningPRISM/StatisticalModelChecking}},
+  year         = {2024},
+  note         = {University of Oxford; see also \textit{CAV} 2011, LNCS 6806, pp.\ 585--591}
+}
+
+@article{liu2025prg4cnn,
+  author  = {Yang Liu and Aohui Fang},
+  title   = {{PRG4CNN}: A Probabilistic Model Checking-Driven Robustness Guarantee Framework for {CNNs}},
+  journal = {Entropy},
+  volume  = {27},
+  number  = {2},
+  pages   = {163},
+  year    = {2025},
+  doi     = {10.3390/e27020163}
+}
+
+%  Literature Review — MBT and Probabilistic Testing
+@article{prasetya2021coverage,
+  author  = {I. S. W. B. Prasetya and Rick Klomp},
+  title   = {Test Model Coverage Analysis Under Uncertainty},
+  journal = {Software and Systems Modeling},
+  volume  = {20},
+  number  = {2},
+  pages   = {383--403},
+  year    = {2021},
+  doi     = {10.1007/s10270-020-00848-9}
+}
+
+@article{alegroth2022practitioners,
+  author  = {Emil Al\'{e}groth and Kristian Karl and Helena Rosshagen and Tomas Helmfridsson and Nils Olsson},
+  title   = {Practitioners' Best Practices to Adopt, Use or Abandon Model-Based Testing with Graphical Models for Software-Intensive Systems},
+  journal = {Empirical Software Engineering},
+  year    = {2022},
+  doi     = {10.1007/s10664-022-10145-2}
+}
+
+@article{ferrari2023transforming,
+  author    = {Fabiano C. Ferrari and Vinicius H. S. Durelli and Sten F. Andler and Jeff Offutt and Mehrdad Saadatmand and Nils M{\"u}llner},
+  title     = {On Transforming Model-Based Tests into Code: A Systematic Literature Review},
+  journal   = {Software Testing, Verification and Reliability},
+  year      = {2023},
+  publisher = {Wiley},
+  doi       = {10.1002/stvr.1831}
+}
+
+@inproceedings{li2023generative,
+  author    = {Zhuo Li and Xiongfei Wu and Derui Zhu and Mengshi Cheng and Siyuan Chen and Fuyuan Zhang and Xiaofei Xie and Lei Ma and Jianjun Zhao},
+  title     = {Generative Model-Based Testing on Decision-Making Policies},
+  booktitle = {Proceedings of the 38th {IEEE/ACM} International Conference on Automated Software Engineering ({ASE})},
+  year      = {2023},
+  doi       = {10.1109/ASE56229.2023.00153}
+}
+
+@inproceedings{garousi2024coverage,
+  author    = {Vahid Garousi and Alper Bu{\u{g}}ra Kele{\c{s}} and Yunus Balaman and Alper Mermer and Zeynep {\"O}zdemir G{\"u}ler},
+  title     = {Coverage Measurement in Model-Based Testing of Web Applications: Tool Support and an Industrial Experience Report},
+  booktitle = {2024 {IEEE} International Conference on Software Testing, Verification and Validation Workshops ({ICSTW})},
+  year      = {2024},
+  doi       = {10.1109/icstw60967.2024.00019}
+}
+
+@inproceedings{shin2021pasta,
+  author    = {Yong-Jun Shin and Eunho Cho and Doo-Hwan Bae},
+  title     = {{PASTA}: An Efficient Proactive Adaptation Approach Based on Statistical Model Checking for Self-Adaptive Systems},
+  booktitle = {Proceedings of the 24th International Conference on Fundamental Approaches to Software Engineering ({FASE})},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12649},
+  year      = {2021},
+  doi       = {10.1007/978-3-030-71500-7_15}
+}
+
+@inproceedings{camilli2021uncertainty,
+  author    = {Matteo Camilli and Angelo Gargantini and Patrizia Scandurra and Catia Trubiani},
+  title     = {Uncertainty-Aware Exploration in Model-Based Testing},
+  booktitle = {Proceedings of the 14th {IEEE} Conference on Software Testing, Verification and Validation ({ICST})},
+  year      = {2021},
+  doi       = {10.1109/ICST49551.2021.00042}
+}
+
 @inproceedings{gerhold2016probabilistic,
   author    = {Marcus Gerhold and Mari{\"e}lle Stoelinga},
   title     = {Model-Based Testing of Probabilistic Systems},
-  booktitle = {Proceedings of the 19th International Conference on Fundamental Approaches to Software Engineering (FASE)},
-  series    = {LNCS},
+  booktitle = {Proceedings of the 19th International Conference on Fundamental Approaches to Software Engineering ({FASE})},
+  series    = {Lecture Notes in Computer Science},
   volume    = {9633},
   pages     = {251--268},
   year      = {2016},
@@ -474,19 +498,19 @@
 }
 
 @article{garousi2021mbt_practice,
-  author    = {Vahid Garousi and Alper Bu{\u{g}}ra Kele{\c{s}} and Yunus Balaman and Zeynep {\"O}zdemir G{\"u}ler and Andrea Arcuri},
-  title     = {Model-Based Testing in Practice: An Experience Report from the Web Applications Domain},
-  journal   = {Journal of Systems and Software},
-  volume    = {180},
-  pages     = {111032},
-  year      = {2021},
-  doi       = {10.1016/j.jss.2021.111032}
+  author  = {Vahid Garousi and Alper Bu{\u{g}}ra Kele{\c{s}} and Yunus Balaman and Zeynep {\"O}zdemir G{\"u}ler and Andrea Arcuri},
+  title   = {Model-Based Testing in Practice: An Experience Report from the Web Applications Domain},
+  journal = {Journal of Systems and Software},
+  volume  = {180},
+  pages   = {111032},
+  year    = {2021},
+  doi     = {10.1016/j.jss.2021.111032}
 }
 
 @article{lassaigne2012approximate,
-  author    = {Richard Lassaigne and Sylvain Peyronnet},
-  title     = {Approximate Planning and Verification for Large {Markov} Decision Processes},
-  journal   = {International Journal on Software Tools for Technology Transfer},
-  year      = {2014},
-  doi       = {10.1007/s10009-014-0344-z}
+  author  = {Richard Lassaigne and Sylvain Peyronnet},
+  title   = {Approximate Planning and Verification for Large {Markov} Decision Processes},
+  journal = {International Journal on Software Tools for Technology Transfer},
+  year    = {2014},
+  doi     = {10.1007/s10009-014-0344-z}
 }
