@@ -11,7 +11,7 @@ export function renderTryIt() {
       <div class="section-header animate-on-scroll">
         <h2 class="section-title">Try It Yourself</h2>
         <p class="section-desc">
-          Select a template, modify the requirements, and watch the pipeline build a model.
+          Select a scenario template and watch the pipeline build a verified model.
         </p>
       </div>
 
@@ -24,35 +24,40 @@ export function renderTryIt() {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <!-- Input -->
+          <!-- Left: Requirements (read-only) + Pipeline -->
           <div class="space-y-4">
+            <!-- Requirements display -->
             <div class="card">
-              <textarea id="try-requirements" rows="6" 
-                class="w-full p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-950 text-sm text-gray-700 dark:text-gray-300 font-mono resize-y focus:outline-none focus:ring-1 focus:ring-gray-400"
-                placeholder="Enter requirements..."></textarea>
-              <button id="try-build" class="btn-primary mt-3">Build Model</button>
+              <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">Requirements</div>
+              <p id="try-requirements" class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"></p>
             </div>
+
+            <!-- Build button -->
+            <button id="try-build" class="btn-primary w-full justify-center">Run Pipeline</button>
 
             <!-- Pipeline progress -->
             <div id="try-pipeline" class="card hidden">
               <div class="space-y-2.5" id="pipeline-steps"></div>
             </div>
 
-            <!-- Info -->
+            <!-- Extracted info -->
             <div id="try-info" class="card hidden">
-              <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">Extracted Model</div>
+              <div class="grid grid-cols-2 gap-3 text-sm mb-3">
                 <div><span class="text-gray-500">States:</span> <span id="try-state-count" class="font-semibold text-gray-900 dark:text-white"></span></div>
                 <div><span class="text-gray-500">Transitions:</span> <span id="try-transition-count" class="font-semibold text-gray-900 dark:text-white"></span></div>
               </div>
-              <div id="try-constraints" class="mt-3 space-y-1"></div>
+              <div class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1.5">Constraints</div>
+              <div id="try-constraints" class="space-y-1"></div>
             </div>
           </div>
 
-          <!-- Output graph -->
+          <!-- Right: Output graph -->
           <div class="card">
+            <div class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Generated State Graph</div>
             <div id="try-graph-container" class="w-full" style="min-height: 360px;">
               <div class="h-full flex items-center justify-center text-sm text-gray-400">
-                Select a template and click "Build Model"
+                Select a template and click "Run Pipeline"
               </div>
             </div>
           </div>
@@ -65,7 +70,6 @@ export function renderTryIt() {
 }
 
 function initTryIt() {
-  const textarea = document.getElementById('try-requirements');
   const buildBtn = document.getElementById('try-build');
   const templateBtns = document.querySelectorAll('.template-btn');
 
@@ -88,7 +92,7 @@ function loadTemplate(id) {
   const template = templates.templates.find((t) => t.id === id);
   if (!template) return;
   currentTemplate = template;
-  document.getElementById('try-requirements').value = template.requirements;
+  document.getElementById('try-requirements').textContent = template.requirements;
   document.getElementById('try-pipeline').classList.add('hidden');
   document.getElementById('try-info').classList.add('hidden');
 }
