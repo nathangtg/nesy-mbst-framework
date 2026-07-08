@@ -8,11 +8,12 @@
 [![IEEE](https://img.shields.io/badge/venue-IEEE_submission-blue.svg)]()
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)]()
 
-**Authors:** Nathan G.<sup>1,2</sup> &nbsp;·&nbsp; Jordan Chay<sup>1</sup> &nbsp;·&nbsp; Jaeden Ting YiYong<sup>1</sup> &nbsp;·&nbsp; Wai Phyo Hein<sup>1</sup>
+**Author:** Nathan G.<sup>1,2</sup> 
 
 <sup>1</sup> School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia  
 <sup>2</sup> Mercedes-Benz Tech Innovation
 
+**Acknowledgments:** Special thanks to Jordan Chay, Jaeden Ting YiYong, and Wai Phyo Hein for their assistance with proofreading and quality assurance.
 ---
 
 ## Overview
@@ -319,13 +320,13 @@ The symbolic feasibility loop is the primary driver of structural correctness an
 
 ```bibtex
 @article{nesy_mbst_2026,
-  author  = {Nathan G. and Jordan Chay and Jaeden Ting YiYong and Wai Phyo Hein},
+  author  = {Nathan Aldyth Prananta G.},
   title   = {The Machine Proposes. The Proof Disposes.: Neuro-Symbolic Synthesis
              of Formally Verified {Markov} Usage Models from Natural Language
              Requirements},
   journal = {IEEE Transactions on Software Engineering},
   year    = {2026},
-  note    = {Under review. Available: https://github.com/nathangtg/llm-mbst-research}
+  note    = {Under review. Available: https://github.com/nathangtg/nesy-mbst-framework}
 }
 ```
 

@@ -7,7 +7,7 @@ export function renderFooter() {
         <div class="mb-8 animate-on-scroll">
           <div class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Authors</div>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Nathan G. &middot; Jaeden Ting YiYong &middot; Wai Phyo Hein &middot; Jordan Chay
+            Nathan Aldyth Prananta G.
           </p>
           <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
             Sunway University &middot; Mercedes-Benz Tech Innovation &middot; 2026
@@ -20,7 +20,7 @@ export function renderFooter() {
           <div class="relative text-left">
             <pre class="code-block text-[11px] leading-relaxed" id="bibtex-content">@article{nathang2026nesy,
   title={The Machine Proposes. The Proof Disposes.},
-  author={Nathan G. and Ting, Jaeden and Hein, Wai Phyo and Chay, Jordan},
+  author={Nathan Aldyth Prananta G.},
   institution={Sunway University},
   year={2026}
 }</pre>
