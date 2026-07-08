@@ -6,166 +6,115 @@
 
 @layer base {
   body {
-    @apply font-sans text-academic-text bg-academic-bg transition-colors duration-300;
-    font-family: 'Inter', system-ui, sans-serif;
+    @apply text-gray-800 bg-white transition-colors duration-200;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  .dark body,
-  body.dark {
-    @apply bg-gray-900 text-gray-100;
+  .dark body, body.dark {
+    @apply bg-gray-950 text-gray-200;
   }
 
-  h1, h2, h3, h4 {
-    @apply font-serif;
+  h1, h2, h3 {
+    @apply tracking-tight;
   }
 }
 
 @layer components {
-  .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24;
+  .section {
+    @apply max-w-6xl mx-auto px-6 py-20 md:py-28;
+  }
+
+  .section-header {
+    @apply mb-12;
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4;
+    @apply text-2xl md:text-3xl font-bold text-gray-900 dark:text-white;
   }
 
-  .section-subtitle {
-    @apply text-lg text-academic-muted dark:text-gray-400 max-w-3xl;
+  .section-desc {
+    @apply mt-3 text-base text-gray-500 dark:text-gray-400 max-w-2xl;
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-academic-border dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md;
+    @apply bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 transition-shadow duration-200;
+  }
+
+  .card:hover {
+    @apply shadow-sm;
   }
 
   .btn-primary {
-    @apply inline-flex items-center px-6 py-3 rounded-lg bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors duration-200 shadow-sm;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors;
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center px-6 py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium text-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200;
-  }
-
-  .metric-card {
-    @apply card text-center;
-  }
-
-  .metric-value {
-    @apply text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400;
-  }
-
-  .metric-label {
-    @apply text-sm text-academic-muted dark:text-gray-400 mt-2;
-  }
-
-  .tag {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
-  }
-
-  .tag-neural {
-    @apply tag bg-neural-light text-neural-dark dark:bg-blue-900/30 dark:text-blue-300;
-  }
-
-  .tag-symbolic {
-    @apply tag bg-symbolic-light text-symbolic-dark dark:bg-green-900/30 dark:text-green-300;
-  }
-
-  .tag-optimization {
-    @apply tag bg-optimization-light text-optimization-dark dark:bg-purple-900/30 dark:text-purple-300;
-  }
-
-  .pipeline-stage {
-    @apply relative flex flex-col items-center p-4 rounded-lg cursor-pointer transition-all duration-300;
-  }
-
-  .pipeline-stage:hover {
-    @apply transform -translate-y-1 shadow-lg;
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
   }
 
   .nav-link {
-    @apply text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200;
+    @apply text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors;
   }
 
   .nav-link.active {
-    @apply text-primary-600 dark:text-primary-400;
+    @apply text-gray-900 dark:text-white;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  .tag-neural {
+    @apply tag bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300;
+  }
+
+  .tag-symbolic {
+    @apply tag bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300;
+  }
+
+  .tag-optimization {
+    @apply tag bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300;
+  }
+
+  .metric-card {
+    @apply text-center p-5;
+  }
+
+  .metric-value {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tabular-nums;
+  }
+
+  .metric-label {
+    @apply text-xs text-gray-500 dark:text-gray-400 mt-1.5 font-medium uppercase tracking-wide;
+  }
+
+  .glass {
+    @apply bg-white/80 dark:bg-gray-950/80 backdrop-blur-md;
   }
 }
 
 @layer utilities {
   .animate-on-scroll {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
   }
 
   .animate-on-scroll.visible {
     opacity: 1;
     transform: translateY(0);
   }
-
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 via-purple-600 to-symbolic;
-  }
-
-  .glass {
-    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm;
-  }
 }
 
-/* D3 Graph Styles */
-.state-node {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.state-node:hover {
-  filter: brightness(1.1);
-}
-
-.state-node.active {
-  stroke-width: 3px;
-  stroke: #3b82f6;
-}
-
-.state-node.walking {
-  animation: pulse 0.5s ease-in-out;
-}
-
-.transition-link {
-  fill: none;
-  stroke-opacity: 0.6;
-  transition: stroke-opacity 0.2s;
-}
-
-.transition-link:hover {
-  stroke-opacity: 1;
-}
-
-.transition-link.active {
-  stroke: #3b82f6;
-  stroke-opacity: 1;
-  stroke-width: 3px;
-}
-
-/* Pipeline Flow Animation */
-.flow-particle {
-  animation: flowParticle 2s linear infinite;
-}
-
-@keyframes flowParticle {
-  0% { offset-distance: 0%; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0; }
-}
-
-/* Typing animation */
+/* Typing cursor */
 .typing-cursor {
   display: inline-block;
   width: 2px;
-  height: 1.2em;
-  background-color: currentColor;
+  height: 1em;
+  background: currentColor;
   animation: blink 1s step-end infinite;
   vertical-align: text-bottom;
+  margin-left: 2px;
 }
 
 @keyframes blink {
@@ -173,35 +122,41 @@
   51%, 100% { opacity: 0; }
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* State graph */
+.state-node { cursor: grab; }
+.state-node:active { cursor: grabbing; }
+.transition-link {
+  fill: none;
+  stroke-opacity: 0.5;
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
-}
-
-/* Code block styling */
+/* Code block */
 .code-block {
-  @apply font-mono text-sm bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto border border-gray-200 dark:border-gray-700;
+  @apply font-mono text-xs bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 overflow-x-auto;
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-700 rounded-full; }
 
 /* Smooth scroll */
-html {
-  scroll-behavior: smooth;
+html { scroll-behavior: smooth; }
+
+/* Pipeline button styles */
+.scenario-btn {
+  @apply px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900;
+}
+.scenario-btn:hover {
+  @apply border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white;
+}
+.scenario-btn.active {
+  @apply bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white;
 }
 
-/* Section dividers */
-.section-divider {
-  @apply border-t border-gray-200 dark:border-gray-700;
+.template-btn {
+  @apply px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400;
+}
+.template-btn.active {
+  @apply bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white;
 }
