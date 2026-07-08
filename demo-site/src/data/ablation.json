@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "id": "pure-neural",
+      "label": "Pure Neural (AI Only)",
+      "description": "LLM generates the entire model without verification",
+      "components": {
+        "neural": true,
+        "symbolic": false,
+        "optimizer": false,
+        "feedback": false
+      },
+      "metrics": {
+        "systemF1": 0.6559,
+        "transitionCoverage": 0.50,
+        "jsd": 0.157,
+        "frobeniusDistance": 0.234,
+        "probabilityAccuracy": "Poor"
+      }
+    },
+    {
+      "id": "neural-symbolic",
+      "label": "+ Symbolic Checker",
+      "description": "Neural extraction with symbolic feasibility verification",
+      "components": {
+        "neural": true,
+        "symbolic": true,
+        "optimizer": false,
+        "feedback": false
+      },
+      "metrics": {
+        "systemF1": 0.9036,
+        "transitionCoverage": 0.857,
+        "jsd": 0.089,
+        "frobeniusDistance": 0.145,
+        "probabilityAccuracy": "Moderate"
+      }
+    },
+    {
+      "id": "neural-symbolic-optimizer",
+      "label": "+ Convex Optimizer",
+      "description": "Full verification plus entropy-maximizing constraint solver",
+      "components": {
+        "neural": true,
+        "symbolic": true,
+        "optimizer": true,
+        "feedback": false
+      },
+      "metrics": {
+        "systemF1": 0.9818,
+        "transitionCoverage": 0.857,
+        "jsd": 0.012,
+        "frobeniusDistance": 0.0654,
+        "probabilityAccuracy": "Near-perfect"
+      }
+    },
+    {
+      "id": "full-nesy",
+      "label": "Full NeSy-MBST",
+      "description": "Complete system with closed-loop telemetry feedback",
+      "components": {
+        "neural": true,
+        "symbolic": true,
+        "optimizer": true,
+        "feedback": true
+      },
+      "metrics": {
+        "systemF1": 0.9818,
+        "transitionCoverage": 0.857,
+        "jsd": 0.012,
+        "frobeniusDistance": 0.0654,
+        "probabilityAccuracy": "Near-perfect (fine-tuned)"
+      }
+    }
+  ],
+  "baselines": [
+    {
+      "id": "gpt4o",
+      "label": "GPT-4o (Direct)",
+      "systemF1": 0.6559,
+      "coverage": 0.50
+    },
+    {
+      "id": "claude35",
+      "label": "Claude 3.5 Sonnet",
+      "systemF1": 0.7950,
+      "coverage": 0.60
+    },
+    {
+      "id": "nesy-mbst",
+      "label": "NeSy-MBST (Ours)",
+      "systemF1": 0.9125,
+      "coverage": 0.857
+    }
+  ]
+}

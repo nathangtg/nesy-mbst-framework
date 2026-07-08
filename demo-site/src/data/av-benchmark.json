@@ -1,0 +1,72 @@
+{
+  "name": "Autonomous Vehicle CPS",
+  "description": "Safety-critical cyber-physical system benchmark with 9 states modeling perception, planning, and actuation modules.",
+  "states": ["Idle", "Sensing", "SceneGraphReady", "PlanningLocal", "PlanningGlobal", "TrajectorySet", "Actuating", "SafeStop", "EmergencyBrake"],
+  "startState": "Idle",
+  "terminalStates": ["SafeStop"],
+  "transitions": [
+    ["Idle", "Sensing"],
+    ["Sensing", "SceneGraphReady"],
+    ["SceneGraphReady", "PlanningLocal"],
+    ["SceneGraphReady", "PlanningGlobal"],
+    ["PlanningLocal", "TrajectorySet"],
+    ["PlanningGlobal", "TrajectorySet"],
+    ["TrajectorySet", "Actuating"],
+    ["Actuating", "Sensing"],
+    ["Actuating", "PlanningLocal"],
+    ["Actuating", "Idle"],
+    ["Actuating", "EmergencyBrake"],
+    ["EmergencyBrake", "SafeStop"],
+    ["SafeStop", "Idle"]
+  ],
+  "transitionMatrix": [
+    [0.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.55, 0.45, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00],
+    [0.05, 0.55, 0.00, 0.30, 0.00, 0.00, 0.00, 0.00, 0.10],
+    [1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00]
+  ],
+  "requirements": "An autonomous vehicle has three core modules: Perception, Planning, and Actuation. The Perception module processes LiDAR and camera data and generates a semantic scene graph. The Planning module computes safe trajectories using local and global planners. The Actuation module executes steering and throttle commands. After perception completes, planning begins. After planning, actuation executes. If perception fails, the system enters a safe stop state. If planning cannot find a trajectory, it reverts to perception for re-evaluation. The system states are: Idle, Sensing, SceneGraphReady, PlanningLocal, PlanningGlobal, TrajectorySet, Actuating, SafeStop, EmergencyBrake. From Idle, the system transitions to Sensing. From Sensing, it goes to SceneGraphReady. From SceneGraphReady, it splits to PlanningLocal and PlanningGlobal. PlanningLocal and PlanningGlobal converge to TrajectorySet. From TrajectorySet, it goes to Actuating. From Actuating, it may loop back to Sensing, PlanningLocal, or Idle. If any module detects a critical failure, the system enters EmergencyBrake then SafeStop. EmergencyBrake can transition to SafeStop, and SafeStop transitions back to Idle. Typically the vehicle actuates rather than re-planning. EmergencyBrake is rare compared to normal actuation.",
+  "constraints": [
+    "P(Sensing | Actuating) > P(PlanningLocal | Actuating)",
+    "P(PlanningLocal | Actuating) > P(EmergencyBrake | Actuating)",
+    "P(PlanningLocal | SceneGraphReady) >= P(PlanningGlobal | SceneGraphReady)",
+    "P(EmergencyBrake | Actuating) < 0.15"
+  ],
+  "blockedTransitions": [
+    ["EmergencyBrake", "Actuating"],
+    ["SafeStop", "EmergencyBrake"]
+  ],
+  "samplePaths": [
+    ["Idle", "Sensing", "SceneGraphReady", "PlanningLocal", "TrajectorySet", "Actuating"],
+    ["Idle", "Sensing", "SceneGraphReady", "PlanningGlobal", "TrajectorySet", "Actuating"],
+    ["Idle", "Sensing", "SceneGraphReady", "PlanningLocal", "TrajectorySet", "Actuating", "Sensing"],
+    ["Idle", "Sensing", "SceneGraphReady", "PlanningGlobal", "TrajectorySet", "Actuating", "PlanningLocal"],
+    ["Idle", "Sensing", "SceneGraphReady", "PlanningLocal", "TrajectorySet", "Actuating", "EmergencyBrake", "SafeStop"]
+  ],
+  "steadyState": [0.048, 0.145, 0.145, 0.190, 0.065, 0.145, 0.238, 0.014, 0.010],
+  "metrics": {
+    "stateF1": 0.9450,
+    "transitionF1": 0.8950,
+    "systemF1": 0.9125,
+    "jsd": 0.012,
+    "frobeniusDistance": 0.0654,
+    "stateCoverage": 1.0,
+    "transitionCoverage": 0.857
+  },
+  "stateCategories": {
+    "Idle": "control",
+    "Sensing": "neural",
+    "SceneGraphReady": "neural",
+    "PlanningLocal": "symbolic",
+    "PlanningGlobal": "symbolic",
+    "TrajectorySet": "symbolic",
+    "Actuating": "control",
+    "SafeStop": "control",
+    "EmergencyBrake": "control"
+  }
+}

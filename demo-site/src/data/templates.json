@@ -1,0 +1,110 @@
+{
+  "templates": [
+    {
+      "id": "login-flow",
+      "name": "Login Flow",
+      "description": "Simple authentication flow with login, 2FA, and session management",
+      "requirements": "A login system has the following states: LoginPage, EnterCredentials, TwoFactorAuth, Dashboard, LockedAccount, ForgotPassword, ResetPassword. Users start at LoginPage and enter credentials. If correct, they proceed to TwoFactorAuth. After 2FA verification, they reach Dashboard. If credentials are wrong 3 times, the account is LockedAccount. From LoginPage, users can go to ForgotPassword, then ResetPassword, then back to LoginPage. Dashboard can go to LoginPage (logout). Successful login is much more common than lockout.",
+      "states": ["LoginPage", "EnterCredentials", "TwoFactorAuth", "Dashboard", "LockedAccount", "ForgotPassword", "ResetPassword"],
+      "transitions": [
+        ["LoginPage", "EnterCredentials"],
+        ["LoginPage", "ForgotPassword"],
+        ["EnterCredentials", "TwoFactorAuth"],
+        ["EnterCredentials", "LockedAccount"],
+        ["TwoFactorAuth", "Dashboard"],
+        ["TwoFactorAuth", "LoginPage"],
+        ["Dashboard", "LoginPage"],
+        ["LockedAccount", "ForgotPassword"],
+        ["ForgotPassword", "ResetPassword"],
+        ["ResetPassword", "LoginPage"]
+      ],
+      "constraints": [
+        "P(TwoFactorAuth | EnterCredentials) > P(LockedAccount | EnterCredentials)",
+        "P(Dashboard | TwoFactorAuth) > P(LoginPage | TwoFactorAuth)"
+      ]
+    },
+    {
+      "id": "shopping-cart",
+      "name": "Shopping Cart",
+      "description": "Simplified e-commerce cart and checkout flow",
+      "requirements": "A shopping cart system has states: Browse, ProductView, Cart, Checkout, PaymentProcessing, OrderComplete, EmptyCart. Users browse products, view details, add to cart, then checkout. Payment processing leads to order completion. Users can return to browse from most states. Checkout requires items in cart. Most users who add items complete checkout.",
+      "states": ["Browse", "ProductView", "Cart", "Checkout", "PaymentProcessing", "OrderComplete", "EmptyCart"],
+      "transitions": [
+        ["Browse", "ProductView"],
+        ["Browse", "Cart"],
+        ["ProductView", "Cart"],
+        ["ProductView", "Browse"],
+        ["Cart", "Checkout"],
+        ["Cart", "Browse"],
+        ["Cart", "EmptyCart"],
+        ["Checkout", "PaymentProcessing"],
+        ["Checkout", "Cart"],
+        ["PaymentProcessing", "OrderComplete"],
+        ["PaymentProcessing", "Checkout"],
+        ["OrderComplete", "Browse"],
+        ["EmptyCart", "Browse"]
+      ],
+      "constraints": [
+        "P(Checkout | Cart) > P(Browse | Cart)",
+        "P(OrderComplete | PaymentProcessing) > P(Checkout | PaymentProcessing)",
+        "P(ProductView | Browse) > P(Cart | Browse)"
+      ]
+    },
+    {
+      "id": "file-upload",
+      "name": "File Upload",
+      "description": "File upload workflow with validation and processing",
+      "requirements": "A file upload system has states: SelectFile, Validating, Uploading, Processing, Complete, ValidationError, UploadError, Retry. Users select a file, it gets validated, then uploaded, then processed, then marked complete. Validation can fail (ValidationError), upload can fail (UploadError). Both errors can lead to Retry, which goes back to SelectFile. Most uploads succeed. Validation errors are more common than upload errors.",
+      "states": ["SelectFile", "Validating", "Uploading", "Processing", "Complete", "ValidationError", "UploadError", "Retry"],
+      "transitions": [
+        ["SelectFile", "Validating"],
+        ["Validating", "Uploading"],
+        ["Validating", "ValidationError"],
+        ["Uploading", "Processing"],
+        ["Uploading", "UploadError"],
+        ["Processing", "Complete"],
+        ["ValidationError", "Retry"],
+        ["UploadError", "Retry"],
+        ["Retry", "SelectFile"],
+        ["Complete", "SelectFile"]
+      ],
+      "constraints": [
+        "P(Uploading | Validating) > P(ValidationError | Validating)",
+        "P(Processing | Uploading) > P(UploadError | Uploading)",
+        "P(ValidationError | Validating) > P(UploadError | Uploading)"
+      ]
+    },
+    {
+      "id": "atm-machine",
+      "name": "ATM Machine",
+      "description": "ATM transaction workflow with card, PIN, and operations",
+      "requirements": "An ATM system has states: Idle, CardInserted, PINEntry, MainMenu, Withdrawal, Deposit, BalanceInquiry, Dispensing, Receipt, CardEjected, PINError, CardRetained. From Idle, a card is inserted. Then PIN entry. Correct PIN goes to MainMenu. Wrong PIN 3 times leads to CardRetained. From MainMenu, users choose Withdrawal, Deposit, or BalanceInquiry. Withdrawal leads to Dispensing then Receipt. All operations end at CardEjected then Idle. Withdrawal is the most common operation. Balance inquiry is least common.",
+      "states": ["Idle", "CardInserted", "PINEntry", "MainMenu", "Withdrawal", "Deposit", "BalanceInquiry", "Dispensing", "Receipt", "CardEjected", "PINError", "CardRetained"],
+      "transitions": [
+        ["Idle", "CardInserted"],
+        ["CardInserted", "PINEntry"],
+        ["PINEntry", "MainMenu"],
+        ["PINEntry", "PINError"],
+        ["PINError", "PINEntry"],
+        ["PINError", "CardRetained"],
+        ["MainMenu", "Withdrawal"],
+        ["MainMenu", "Deposit"],
+        ["MainMenu", "BalanceInquiry"],
+        ["Withdrawal", "Dispensing"],
+        ["Dispensing", "Receipt"],
+        ["Deposit", "Receipt"],
+        ["BalanceInquiry", "Receipt"],
+        ["Receipt", "MainMenu"],
+        ["Receipt", "CardEjected"],
+        ["CardEjected", "Idle"],
+        ["CardRetained", "Idle"]
+      ],
+      "constraints": [
+        "P(MainMenu | PINEntry) > P(PINError | PINEntry)",
+        "P(Withdrawal | MainMenu) > P(Deposit | MainMenu)",
+        "P(Withdrawal | MainMenu) > P(BalanceInquiry | MainMenu)",
+        "P(PINEntry | PINError) > P(CardRetained | PINError)"
+      ]
+    }
+  ]
+}
