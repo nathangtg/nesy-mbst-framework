@@ -13,7 +13,8 @@
 <sup>1</sup> School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia  
 <sup>2</sup> Mercedes-Benz Tech Innovation
 
-**Acknowledgments:** Special thanks to Jordan Chay, Jaeden Ting YiYong, and Wai Phyo Hein for their assistance with proofreading and quality assurance.
+**Contributors:** 
+*   **Proofreading & Review:** Jordan Chay, Jaeden Ting YiYong, Wai Phyo Hein
 ---
 
 ## Overview
