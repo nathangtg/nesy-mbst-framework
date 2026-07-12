@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeSy-MBST — The Machine Proposes. The Proof Disposes.</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+<style>
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #060a10; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+/* ─── Impress canvas ─────────────────────────────────────────────────────── */
+#impress-not-supported {
+  position: fixed; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: #94a3b8; font-size: 1.1rem; text-align: center; gap: 12px;
+  background: #060a10;
+}
+
+/* ─── Slide base ─────────────────────────────────────────────────────────── */
+.step {
+  width: 1080px;
+  min-height: 640px;
+  padding: 56px 64px 48px;
+  border-radius: 20px;
+  position: relative;
+  /* impress hides inactive steps */
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.step.present { opacity: 1; }
+.step.active  { opacity: 1; }
+
+/* ─── Palette ────────────────────────────────────────────────────────────── */
+:root {
+  --blue:    #3b82f6;
+  --lblue:   #93c5fd;
+  --orange:  #f59e0b;
+  --lorange: #fcd34d;
+  --green:   #10b981;
+  --lgreen:  #6ee7b7;
+  --purple:  #a78bfa;
+  --red:     #ef4444;
+  --surface: #0f172a;
+  --surface2:#1e293b;
+  --border:  #334155;
+  --text:    #cbd5e1;
+  --heading: #f1f5f9;
+  --muted:   #64748b;
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+h1 { font-size: 2.6rem; font-weight: 800; line-height: 1.15; color: var(--heading); letter-spacing: -.02em; }
+h2 { font-size: 1.4rem; font-weight: 700; color: var(--heading); letter-spacing: -.01em; margin-bottom: 24px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+h3 { font-size: .95rem; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
+p  { font-size: .88rem; line-height: 1.7; color: var(--text); }
+li { font-size: .86rem; line-height: 1.75; color: var(--text); margin-bottom: 2px; }
+strong { color: var(--heading); }
+em { color: var(--lblue); font-style: normal; }
+code {
+  font-family: 'JetBrains Mono','Cascadia Code',monospace;
+  font-size: .78rem;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: #7dd3fc;
+}
+ul, ol { padding-left: 1.4em; }
+
+/* ─── Color helpers ──────────────────────────────────────────────────────── */
+.pos  { color: var(--blue)    !important; }
+.con  { color: var(--orange)  !important; }
+.hl   { color: var(--green)   !important; }
+.dim  { color: var(--muted)   !important; }
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+.cols { display: flex; gap: 24px; align-items: flex-start; }
+.col  { flex: 1; min-width: 0; }
+.w40  { flex: 0 0 40%; }
+.w55  { flex: 0 0 56%; }
+.w60  { flex: 0 0 60%; }
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.card.bl { border-left: 3px solid var(--blue); }
+.card.or { border-left: 3px solid var(--orange); }
+.card.gr { border-left: 3px solid var(--green); }
+.card.pu { border-left: 3px solid var(--purple); }
+.card.re { border-left: 3px solid var(--red); }
+
+/* ─── Big stat ───────────────────────────────────────────────────────────── */
+.bignum {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--green);
+  letter-spacing: -.03em;
+}
+.biglbl {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ─── Callout ────────────────────────────────────────────────────────────── */
+.callout {
+  background: rgba(16,185,129,.07);
+  border: 1px solid rgba(16,185,129,.35);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: .84rem;
+  color: var(--lgreen);
+  text-align: center;
+  margin-top: 16px;
+}
+.callout.warn {
+  background: rgba(245,158,11,.07);
+  border-color: rgba(245,158,11,.35);
+  color: var(--lorange);
+}
+
+/* ─── Badge ──────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  margin-right: 5px;
+}
+.bbl { background: #1e3a5f; color: var(--blue); }
+.bgr { background: #052e16; color: var(--green); }
+.bor { background: #431407; color: var(--orange); }
+.bpu { background: #2e1b5e; color: var(--purple); }
+
+/* ─── Table ──────────────────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+th {
+  background: var(--surface2);
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: .68rem;
+  letter-spacing: .06em;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid #1e293b;
+  color: var(--text);
+}
+tr:last-child td { border-bottom: none; }
+tr.hlr td { color: var(--heading); font-weight: 700; background: #162032; }
+tr.dimr td { color: var(--muted); font-size: .75rem; }
+
+/* ─── Slide types ────────────────────────────────────────────────────────── */
+
+/* Default dark glass */
+.slide-default {
+  background: linear-gradient(145deg, #0d1520 0%, #0f1a28 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04) inset;
+}
+
+/* Title */
+.slide-title {
+  background: radial-gradient(ellipse at 25% 40%, #0b1f3a 0%, #060a10 70%);
+  border: 1px solid #1e3a5f;
+  box-shadow: 0 0 120px rgba(59,130,246,.12), 0 24px 80px rgba(0,0,0,.8);
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* Section divider */
+.slide-section {
+  background: radial-gradient(ellipse at 50% 50%, #071a10 0%, #060a10 65%);
+  border: 1px solid rgba(16,185,129,.25);
+  box-shadow: 0 0 100px rgba(16,185,129,.1), 0 24px 80px rgba(0,0,0,.8);
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+.sec-num {
+  font-size: 8rem; font-weight: 900;
+  color: rgba(16,185,129,.08);
+  line-height: 1; margin-bottom: -20px;
+  letter-spacing: -.05em;
+}
+.slide-section h2 {
+  border: none;
+  color: var(--green);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+/* Accent glows per section */
+.glow-blue  { box-shadow: 0 0 100px rgba(59,130,246,.12),  0 24px 80px rgba(0,0,0,.7); }
+.glow-green { box-shadow: 0 0 100px rgba(16,185,129,.12),  0 24px 80px rgba(0,0,0,.7); }
+.glow-oran  { box-shadow: 0 0 100px rgba(245,158,11,.10),  0 24px 80px rgba(0,0,0,.7); }
+.glow-purp  { box-shadow: 0 0 100px rgba(167,139,250,.10), 0 24px 80px rgba(0,0,0,.7); }
+
+/* ─── HR divider ─────────────────────────────────────────────────────────── */
+.div { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ─── Slide number ───────────────────────────────────────────────────────── */
+.snum {
+  position: absolute;
+  bottom: 18px; right: 24px;
+  font-size: .68rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+}
+
+/* ─── Nav hint ───────────────────────────────────────────────────────────── */
+#hint {
+  position: fixed;
+  bottom: 22px; left: 50%;
+  transform: translateX(-50%);
+  font-size: .7rem;
+  color: #334155;
+  z-index: 1000;
+  pointer-events: none;
+  letter-spacing: .06em;
+  transition: opacity 1s;
+}
+
+/* ─── Fallback (only shown when CSS 3D truly unavailable) ────────────────── */
+.impress-not-supported #impress-not-supported {
+  display: flex !important;
+  position: fixed; inset: 0;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  background: #060a10; color: #94a3b8;
+  font-size: 1.1rem; text-align: center; z-index: 9999;
+}
+.impress-not-supported .step {
+  display: block; margin: 40px auto; opacity: 1; position: static;
+}
+</style>
+</head>
+<body>
+
+<!-- impress.js adds class "impress-not-supported" to body if 3D CSS unavailable.
+     We hide this div by default; it only shows if that class is present. -->
+<div id="impress-not-supported" style="display:none">
+  <p>CSS 3D transforms not available. Please enable hardware acceleration in your browser.</p>
+</div>
+
+<div id="hint">← → arrow keys &nbsp;·&nbsp; Space to advance</div>
+
+<div id="impress"
+  data-transition-duration="900"
+  data-width="1080"
+  data-height="640"
+  data-max-scale="2"
+  data-min-scale="0.2"
+  data-perspective="1000">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     1 · TITLE
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s1" class="step slide-title"
+  data-x="0" data-y="0">
+
+  <div style="margin-bottom:14px">
+    <span class="badge bbl">Conference Paper</span>
+    <span class="badge bgr">NeSy-MBST</span>
+  </div>
+
+  <h1 style="max-width:860px; margin-bottom:18px">
+    The Machine Proposes.<br>
+    <span style="color:var(--blue)">The Proof Disposes.</span>
+  </h1>
+
+  <p style="font-size:.95rem; color:var(--muted); max-width:680px; margin-bottom:32px; line-height:1.7">
+    Neuro-Symbolic Synthesis of Formally Verified<br>
+    Markov Usage Models from Natural Language Requirements
+  </p>
+
+  <hr class="div" style="max-width:420px; margin-left:0">
+
+  <p style="font-size:.78rem; color:#475569; line-height:2.1; margin-top:18px">
+    Nathan G. &nbsp;·&nbsp; Jordan Chay &nbsp;·&nbsp; Jaeden Ting YiYong &nbsp;·&nbsp; Wai Phyo Hein<br>
+    <span style="color:#334155">School of Computing and Artificial Intelligence, Sunway University, Malaysia</span>
+  </p>
+
+  <span class="snum">1 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     2 · BOTTLENECK
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s2" class="step slide-default glow-blue"
+  data-x="1400" data-y="0">
+
+  <h2>The MBST Bottleneck</h2>
+
+  <div class="cols">
+    <div class="w55">
+      <div class="card bl" style="margin-bottom:12px">
+        <h3>Model-Based Statistical Testing</h3>
+        <ul>
+          <li>Replaces ad-hoc testing with <span class="pos">probabilistic test generation</span></li>
+          <li>Markov chain encodes the <em>operational profile</em></li>
+          <li>Enables statistical reliability certification</li>
+        </ul>
+      </div>
+      <div class="card or">
+        <h3 class="con">The blocking problem</h3>
+        <ul>
+          <li>Manual construction: <span class="con">labor-intensive, expert-only</span></li>
+          <li>Confined MBST to aerospace / medical / telecom niches</li>
+          <li>NL requirements → verified state machines: <span class="con">no automated path</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="w40" style="text-align:center; padding-top:8px">
+      <svg width="300" height="190" viewBox="0 0 300 190">
+        <defs>
+          <marker id="ar1" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+            <polygon points="0 0,7 2.5,0 5" fill="#475569"/>
+          </marker>
+        </defs>
+        <rect x="4" y="78" width="52" height="26" rx="6" fill="#0f172a" stroke="#334155"/>
+        <text x="30" y="95" text-anchor="middle" font-size="11" fill="#64748b">Begin</text>
+
+        <circle cx="126" cy="91" r="28" fill="#0f1f35" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="126" y="96" text-anchor="middle" font-size="13" fill="#93c5fd" font-weight="600">s₁</text>
+
+        <circle cx="220" cy="91" r="28" fill="#0f1f35" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="220" y="96" text-anchor="middle" font-size="13" fill="#93c5fd" font-weight="600">s₂</text>
+
+        <rect x="256" y="78" width="40" height="26" rx="6" fill="#0f172a" stroke="#334155"/>
+        <text x="276" y="95" text-anchor="middle" font-size="11" fill="#64748b">End</text>
+
+        <line x1="56" y1="91" x2="96" y2="91" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <path d="M112 64 A26 26 0 1 1 140 64" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="126" y="28" text-anchor="middle" font-size="10" fill="#64748b">0.90</text>
+        <path d="M154 78 Q174 56 206 78" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="178" y="56" text-anchor="middle" font-size="10" fill="#64748b">0.10</text>
+        <path d="M206 104 Q174 128 154 104" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="178" y="144" text-anchor="middle" font-size="10" fill="#64748b">0.10</text>
+        <path d="M206 64 A26 26 0 1 1 234 64" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="220" y="28" text-anchor="middle" font-size="10" fill="#64748b">0.90</text>
+        <line x1="248" y1="91" x2="256" y2="91" stroke="#475569" stroke-width="1.5" marker-end="url(#ar1)"/>
+      </svg>
+      <p class="dim" style="font-size:.7rem; margin-top:6px">Markov chain usage model</p>
+    </div>
+  </div>
+
+  <span class="snum">2 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     3 · FOUR BOTTLENECKS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s3" class="step slide-default glow-oran"
+  data-x="2800" data-y="0">
+
+  <h2>Four Structural Bottlenecks of Pure-Neural Approaches</h2>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card or"><h3 class="con">B1 — Hallucination</h3>
+        <p>LLMs omit edges, create impossible transitions, violate system invariants — silently.</p>
+      </div>
+      <div class="card or"><h3 class="con">B2 — Calibration Failure</h3>
+        <p>Cannot guarantee row-stochastic \(\mathbf{P}\): &nbsp;\(\sum_j p_{ij}=1\), \(p_{ij}\geq 0\) — violated without warning.</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card or"><h3 class="con">B3 — State-Space Explosion</h3>
+        <p>Finite context window → context fragmentation on large concurrent models.</p>
+      </div>
+      <div class="card or"><h3 class="con">B4 — Structural Incompleteness</h3>
+        <p>Recall-limited generation misses guard–action semantics of inter-state edges.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn" style="margin-top:20px">
+    ⚠&ensp;None of these failure modes can be fixed by prompting alone
+  </div>
+
+  <span class="snum">3 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     4 · SECTION — RQs   (rotate + zoom out, fly in from top)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s4" class="step slide-section"
+  data-x="1400" data-y="-1000" data-rotate="6" data-scale="1">
+  <div class="sec-num">01</div>
+  <h2>Research Questions</h2>
+  <p class="dim">What we set out to prove</p>
+  <span class="snum">4 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     5 · RQs
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s5" class="step slide-default glow-blue"
+  data-x="4200" data-y="0">
+
+  <h2>Research Questions</h2>
+
+  <div class="card bl" style="margin-bottom:10px">
+    <span class="badge bbl">RQ1</span> <strong>Structural Fidelity</strong>
+    <p style="margin-top:6px">Can automated neuro-symbolic construction achieve \(F_1 \geq 0.90\) required for safety-critical test generation, without manual modelling?</p>
+  </div>
+  <div class="card gr" style="margin-bottom:10px">
+    <span class="badge bgr">RQ2</span> <strong>Fault-Detection Coverage</strong>
+    <p style="margin-top:6px">Does NeSy-MBST produce higher transition/state coverage than a purely neural baseline?</p>
+  </div>
+  <div class="card pu" style="margin-bottom:10px">
+    <span class="badge bpu">RQ3</span> <strong>Probabilistic Calibration</strong>
+    <p style="margin-top:6px">Does symbolic constraint optimization preserve operationally weighted transition probabilities?</p>
+  </div>
+  <div class="card bl">
+    <span class="badge bbl">RQ4</span> <strong>Component Necessity</strong>
+    <p style="margin-top:6px">Which components (symbolic loop, convex optimizer, closed-loop feedback) are individually necessary?</p>
+  </div>
+
+  <span class="snum">5 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     6 · SECTION — Framework
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s6" class="step slide-section"
+  data-x="2800" data-y="-1000" data-rotate="-6" data-scale="1">
+  <div class="sec-num">02</div>
+  <h2>NeSy-MBST Framework</h2>
+  <p class="dim">Five integrated components</p>
+  <span class="snum">6 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     7 · ARCHITECTURE
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s7" class="step slide-default glow-blue"
+  data-x="5600" data-y="0">
+
+  <h2>NeSy-MBST Architecture</h2>
+
+  <div class="cols">
+    <div class="w55">
+      <p style="font-size:.82rem; margin-bottom:14px; color:var(--muted)">
+        <strong style="color:var(--heading)">Key principle:</strong> Neural for language-laden tasks; symbolic for formal precision.
+      </p>
+      <ol style="font-size:.85rem; line-height:2.1">
+        <li><span class="pos">Dual-memory architecture</span> — neural + symbolic</li>
+        <li><span class="pos">\(L^*\) active automata learning</span> with LLM oracles</li>
+        <li><span class="pos">Path-dependent hierarchical modeling</span></li>
+        <li><span class="pos">Symbolic constraint optimization</span> (convex solver)</li>
+        <li><span class="pos">Closed-loop telemetry feedback</span></li>
+      </ol>
+    </div>
+    <div class="w40">
+      <svg width="310" height="360" viewBox="0 0 310 360" style="display:block;margin:0 auto">
+        <defs>
+          <marker id="pa" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+            <polygon points="0 0,6 2.5,0 5" fill="#475569"/>
+          </marker>
+        </defs>
+        <!-- ALE -->
+        <rect x="6" y="12" width="120" height="44" rx="7" fill="#0d1f3a" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="66" y="30" text-anchor="middle" font-size="10" fill="#93c5fd" font-weight="700">Active Learning</text>
+        <text x="66" y="46" text-anchor="middle" font-size="8.5" fill="#475569">L* Algorithm</text>
+        <!-- Oracle -->
+        <rect x="174" y="12" width="128" height="44" rx="7" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+        <text x="238" y="30" text-anchor="middle" font-size="10" fill="#6ee7b7" font-weight="700">LLM Oracle</text>
+        <text x="238" y="46" text-anchor="middle" font-size="8.5" fill="#475569">grammar-constrained</text>
+        <!-- ALE → Oracle -->
+        <line x1="126" y1="34" x2="174" y2="34" stroke="#475569" stroke-width="1.2" marker-end="url(#pa)"/>
+        <text x="150" y="29" text-anchor="middle" font-size="7.5" fill="#475569">membership q.</text>
+        <!-- SUT -->
+        <rect x="174" y="110" width="128" height="44" rx="7" fill="#2d0c0c" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="238" y="128" text-anchor="middle" font-size="10" fill="#fca5a5" font-weight="700">SUT Execution</text>
+        <text x="238" y="144" text-anchor="middle" font-size="8.5" fill="#475569">returns counterex.</text>
+        <!-- Oracle → SUT -->
+        <line x1="238" y1="56" x2="238" y2="110" stroke="#475569" stroke-width="1.2" marker-end="url(#pa)"/>
+        <text x="248" y="86" font-size="7.5" fill="#475569">responses</text>
+        <!-- ALE → SUT equiv query -->
+        <path d="M66 56 L66 88 L238 88 L238 110" fill="none" stroke="#475569" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#pa)"/>
+        <text x="152" y="83" text-anchor="middle" font-size="7.5" fill="#475569">equiv. queries</text>
+        <!-- Topology -->
+        <rect x="6" y="110" width="120" height="44" rx="7" fill="#1c1900" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="66" y="128" text-anchor="middle" font-size="10" fill="#fcd34d" font-weight="700">Verified Topology</text>
+        <text x="66" y="144" text-anchor="middle" font-size="8.5" fill="#475569">state graph</text>
+        <!-- SUT → Topology -->
+        <line x1="174" y1="132" x2="126" y2="132" stroke="#475569" stroke-width="1.2" marker-end="url(#pa)"/>
+        <text x="150" y="127" text-anchor="middle" font-size="7.5" fill="#475569">counterex.</text>
+        <!-- Solver -->
+        <rect x="6" y="208" width="120" height="44" rx="7" fill="#1c0e00" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="66" y="226" text-anchor="middle" font-size="10" fill="#fdba74" font-weight="700">Constraint Solver</text>
+        <text x="66" y="242" text-anchor="middle" font-size="8.5" fill="#475569">convex optimization</text>
+        <!-- Topology → Solver -->
+        <line x1="66" y1="154" x2="66" y2="208" stroke="#475569" stroke-width="1.2" marker-end="url(#pa)"/>
+        <!-- Model -->
+        <rect x="6" y="304" width="120" height="44" rx="7" fill="#1e1b3a" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="66" y="322" text-anchor="middle" font-size="10" fill="#c4b5fd" font-weight="700">Calibrated Model</text>
+        <text x="66" y="338" text-anchor="middle" font-size="8.5" fill="#475569">→ test sequences</text>
+        <!-- Solver → Model -->
+        <line x1="66" y1="252" x2="66" y2="304" stroke="#475569" stroke-width="1.2" marker-end="url(#pa)"/>
+        <!-- Feedback loop -->
+        <path d="M6 326 L-14 326 L-14 34 L6 34" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#pa)"/>
+        <text x="-5" y="185" text-anchor="middle" font-size="7" fill="#334155" transform="rotate(-90,-5,185)">runtime feedback</text>
+      </svg>
+    </div>
+  </div>
+
+  <span class="snum">7 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     8 · DUAL MEMORY
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s8" class="step slide-default glow-blue"
+  data-x="7000" data-y="0">
+
+  <h2>Component 1 — Dual Memory Architecture</h2>
+
+  <div class="cols" style="margin-top:10px">
+    <div class="col">
+      <div class="card bl" style="min-height:170px; padding:20px">
+        <h3 style="font-size:1rem; margin-bottom:12px">⚙ Neural Progress Memory</h3>
+        <p>Fine-tuned LLM parses NL requirements and drafts a semantic flow graph.</p>
+        <p style="margin-top:10px">Captures <em>what</em>: candidate states, events, and transitions.</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card gr" style="min-height:170px; padding:20px">
+        <h3 style="font-size:1rem; margin-bottom:12px; color:var(--green)">✓ Symbolic Feasibility Memory</h3>
+        <p>Rule-based engine enforces invariants, preconditions, and transition guards.</p>
+        <p style="margin-top:10px">Ensures <em>how</em>: every transition is reachable, deterministic, contradiction-free.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    Result: topology is both <strong>semantically plausible</strong> and <strong>mathematically sound</strong><br>
+    <span style="font-size:.9em">Avoids the end-to-end neural failure: syntactically valid yet logically inconsistent models</span>
+  </div>
+
+  <span class="snum">8 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     9 · L* LEARNING
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s9" class="step slide-default glow-green"
+  data-x="8400" data-y="0">
+
+  <h2>Component 2 — \(L^*\) Active Automata Learning</h2>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card bl" style="margin-bottom:12px">
+        <h3>Membership Queries</h3>
+        <p>"Does SUT accept sequence \(\sigma \in \Sigma^*\)?"</p>
+        <p style="margin-top:6px">Oracle vocabulary: <code>Yes</code> / <code>No</code> / <code>Unsure</code><br>Eliminates hallucinated responses entirely.</p>
+      </div>
+      <div class="card gr">
+        <h3>Equivalence Queries</h3>
+        <p>"Is hypothesis \(\mathcal{H}\) equivalent to the target?"</p>
+        <p style="margin-top:6px">Resolved by SUT execution. Counterexamples refine \(\mathcal{H}\) iteratively until convergence.</p>
+      </div>
+    </div>
+    <div class="col" style="text-align:center; padding-top:14px">
+      <div style="margin-bottom:22px">
+        <div class="bignum">94%</div>
+        <div class="biglbl">queries resolved<br>by oracle directly</div>
+      </div>
+      <div style="margin-bottom:22px">
+        <div class="bignum" style="color:var(--blue)">6%</div>
+        <div class="biglbl">escalated to<br>SUT execution</div>
+      </div>
+      <div>
+        <div class="bignum" style="color:var(--purple)">0%</div>
+        <div class="biglbl">Unsure rate<br>on AV benchmark</div>
+      </div>
+    </div>
+  </div>
+
+  <span class="snum">9 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     10 · HIERARCHICAL + CONVEX
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s10" class="step slide-default glow-purp"
+  data-x="9800" data-y="0">
+
+  <h2>Components 3 &amp; 4 — Hierarchical Modeling + Convex Optimization</h2>
+
+  <div class="cols">
+    <div class="col">
+      <p style="font-weight:700; color:var(--heading); font-size:.85rem; margin-bottom:10px">Hierarchical Model</p>
+      <div class="card bl" style="margin-bottom:10px">
+        <h3 style="font-size:.85rem">Upper — Higher-order Markov</h3>
+        <p style="text-align:center; margin:8px 0">\[P(s_{t+1} \mid s_t, s_{t-1}, \ldots, s_{t-k+1})\]</p>
+        <p style="font-size:.78rem" class="dim">Frequent, path-dependent sequences</p>
+      </div>
+      <div class="card gr">
+        <h3 style="font-size:.85rem">Lower — First-order Markov</h3>
+        <p style="text-align:center; margin:8px 0">\[P(s_{t+1} \mid s_t)\]</p>
+        <p style="font-size:.78rem" class="dim">Rare / exception paths — prevents explosion</p>
+      </div>
+    </div>
+    <div class="col">
+      <p style="font-weight:700; color:var(--heading); font-size:.85rem; margin-bottom:10px">Convex Optimization</p>
+      <p style="font-size:.82rem; margin-bottom:10px">LLM extracts constraints, e.g.<br>\(P(\texttt{checkout}\mid\texttt{cart}) > P(\texttt{browse}\mid\texttt{cart})\)</p>
+      <div class="card pu">
+        <h3 style="font-size:.85rem; color:var(--purple)">Solver minimizes</h3>
+        <p style="text-align:center; margin:8px 0">\[\mathbf{P}^* = \arg\min_{\mathbf{P}\in\mathcal{C}}\;\mathcal{L}(\mathbf{P})\]</p>
+        <p style="font-size:.78rem" class="dim">Max-entropy regularization &nbsp;·&nbsp; \(\sum_j p_{ij}=1,\; p_{ij}\geq 0\)</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="snum">10 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     11 · SECTION — Evaluation
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s11" class="step slide-section"
+  data-x="4200" data-y="-1000" data-rotate="6" data-scale="1">
+  <div class="sec-num">03</div>
+  <h2>Empirical Evaluation</h2>
+  <p class="dim">RQ1 · RQ2 · RQ3</p>
+  <span class="snum">11 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     12 · F1 TABLE
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s12" class="step slide-default glow-blue"
+  data-x="11200" data-y="0">
+
+  <h2>RQ1 — Extraction Accuracy (F1 Scores)</h2>
+
+  <table style="margin-bottom:18px">
+    <thead>
+      <tr><th>Strategy</th><th>State F1</th><th>Trans. F1</th><th>System F1</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Single-Prompt (GPT-4o)</td><td>0.800</td><td>0.540</td><td>0.543</td></tr>
+      <tr><td>Hybrid SMF (GPT-4o) — best GPT-4o</td><td>0.858</td><td>0.649</td><td>0.656</td></tr>
+      <tr><td>Single-Prompt (Claude 3.5 Sonnet)</td><td>0.900</td><td>0.750</td><td>0.795</td></tr>
+      <tr class="hlr"><td><strong>NeSy-MBST (ours)</strong></td>
+        <td class="hl"><strong>0.945</strong></td>
+        <td class="hl"><strong>0.895</strong></td>
+        <td class="hl"><strong>0.9125</strong></td>
+      </tr>
+      <tr class="dimr"><td colspan="4">— Safety-critical threshold: F₁ ≥ 0.90 —</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols">
+    <div class="col" style="display:flex; gap:28px; align-items:center">
+      <div style="text-align:center">
+        <div class="bignum">+39.1%</div>
+        <div class="biglbl">vs best GPT-4o<br>multi-frame</div>
+      </div>
+      <div style="text-align:center">
+        <div class="bignum" style="color:var(--blue)">+14.8%</div>
+        <div class="biglbl">vs best single-<br>model baseline</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="callout">Symbolic verification loop converts recall-limited generation into <strong>verification-guided completion</strong></div>
+    </div>
+  </div>
+
+  <span class="snum">12 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     13 · OPERATIONAL COVERAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s13" class="step slide-default glow-green"
+  data-x="12600" data-y="0">
+
+  <h2>RQ2 — Operational Coverage (E-Commerce)</h2>
+
+  <table style="margin-bottom:20px">
+    <thead>
+      <tr><th>Model</th><th>States</th><th>Transitions</th><th>Req. Coverage</th><th>Trans. Coverage</th><th>Time</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>User Model</td><td>24</td><td>112</td>
+        <td class="hl"><strong>100%</strong></td><td class="hl"><strong>100%</strong></td><td>1 m 48 s</td>
+      </tr>
+      <tr>
+        <td>Admin Model</td><td>42</td><td>218</td>
+        <td class="hl"><strong>100%</strong></td><td class="hl"><strong>100%</strong></td><td>5 m 49 s</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card gr">
+        <ul>
+          <li><span class="hl">Full model-coverage</span> in <strong>under 6 minutes</strong> on models up to 42 states</li>
+          <li><span class="hl">Sub-quadratic scaling</span>: Admin (2× complexity) → only 3.2× time</li>
+          <li>Pure-neural baseline: 50% → <span class="hl">+35.7 pp gain</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card bl">
+        <p>≤ <strong>3 human-in-the-loop interventions</strong> per model in practice, starting entirely from natural-language requirements.</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="snum">13 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     14 · JSD
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s14" class="step slide-default glow-purp"
+  data-x="14000" data-y="0">
+
+  <h2>RQ3 — Probabilistic Fidelity</h2>
+
+  <div class="cols">
+    <div class="w60">
+      <table style="margin-bottom:18px">
+        <thead><tr><th>Metric</th><th>Measures</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Jensen–Shannon Divergence</td><td>Activity marginals</td><td class="hl"><strong>0.0142</strong></td></tr>
+          <tr><td>Frobenius Distance (norm.)</td><td>Entry-wise deviation</td><td class="hl"><strong>0.0841</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="cols" style="gap:28px; text-align:center">
+        <div>
+          <div class="bignum">0.012</div>
+          <div class="biglbl">JSD — NeSy-MBST</div>
+        </div>
+        <div>
+          <div class="bignum" style="color:var(--orange)">0.157</div>
+          <div class="biglbl">JSD — uncalibrated</div>
+        </div>
+      </div>
+    </div>
+    <div class="w40">
+      <div class="callout" style="margin-bottom:14px">
+        <strong>93% reduction</strong> in divergence<br><br>
+        JSD = 0.012 confirms <span class="hl">preserved operational test-allocation fidelity</span>
+      </div>
+      <div class="card bl">
+        <p style="font-size:.82rem">Entropy-maximizing SLSQP solver vs. uncalibrated random initialization on identical topology.</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="snum">14 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     15 · SECTION — Ablation
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s15" class="step slide-section"
+  data-x="5600" data-y="-1000" data-rotate="-6" data-scale="1">
+  <div class="sec-num">04</div>
+  <h2>Ablation Study</h2>
+  <p class="dim">RQ4 — Component Necessity</p>
+  <span class="snum">15 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     16 · ABLATION TABLE
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s16" class="step slide-default glow-oran"
+  data-x="15400" data-y="0">
+
+  <h2>RQ4 — Ablation on AV CPS Benchmark (9 states, 13 transitions)</h2>
+
+  <table style="margin-bottom:16px; font-size:.76rem">
+    <thead>
+      <tr><th>Condition</th><th>St. F1</th><th>Tr. F1</th><th>Sys. F1</th><th>JSD</th><th>Frob</th><th>St. Cov</th><th>Tr. Cov</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A — Pure-Neural</td>
+        <td>1.000</td><td class="con">0.783</td><td>0.904</td>
+        <td class="con">0.157</td><td>0.163</td>
+        <td class="con">55.6%</td><td class="con">50.0%</td>
+      </tr>
+      <tr>
+        <td>B — +Symbolic Loop</td>
+        <td>1.000</td><td class="pos">0.963</td><td class="pos">0.982</td>
+        <td class="hl">0.012</td><td>0.084</td>
+        <td class="pos">88.9%</td><td class="pos">85.7%</td>
+      </tr>
+      <tr>
+        <td>C — +Convex Optimizer</td>
+        <td>1.000</td><td>0.963</td><td>0.982</td>
+        <td>0.012</td><td>0.084</td><td>88.9%</td><td>85.7%</td>
+      </tr>
+      <tr class="hlr">
+        <td><strong>D — Full NeSy-MBST</strong></td>
+        <td>1.000</td><td>0.963</td><td>0.982</td>
+        <td class="hl">0.012</td><td>0.084</td><td>88.9%</td><td>85.7%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul style="font-size:.84rem">
+    <li><strong>A→B</strong> <span class="pos">(Symbolic loop)</span>: Tr.F1 0.783→0.963; JSD 0.157→0.012; coverage +33 pp — <em>dominant driver</em></li>
+    <li><strong>B→C</strong> <span class="pos">(Convex optimizer)</span>: structural unchanged; governs probabilistic calibration only</li>
+    <li><strong>C→D</strong> (Closed-loop): marginal \(\Delta\)JSD −0.0002; accumulates over extended campaigns</li>
+  </ul>
+
+  <span class="snum">16 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     17 · ORTHOGONAL MODES
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s17" class="step slide-default glow-green"
+  data-x="16800" data-y="0">
+
+  <h2>Ablation Insight — Two Orthogonal Failure Modes</h2>
+
+  <div class="cols" style="margin-top:20px; gap:28px">
+    <div class="col">
+      <div class="card bl" style="text-align:center; padding:28px 20px; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center">
+        <div style="font-size:2.8rem; margin-bottom:12px">🔍</div>
+        <h3 style="text-align:center; font-size:1.05rem; margin-bottom:12px">Symbolic Loop</h3>
+        <p>Corrects <strong>structural errors</strong></p>
+        <p class="dim" style="font-size:.8rem; margin-top:8px">Unreachable states, missing transitions, dangling edges</p>
+        <p class="pos" style="font-size:.75rem; margin-top:14px; letter-spacing:.05em">MEASURED BY: F1 · COVERAGE</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card gr" style="text-align:center; padding:28px 20px; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center">
+        <div style="font-size:2.8rem; margin-bottom:12px">⚖️</div>
+        <h3 style="text-align:center; font-size:1.05rem; margin-bottom:12px; color:var(--green)">Convex Optimizer</h3>
+        <p>Corrects <strong>calibration errors</strong></p>
+        <p class="dim" style="font-size:.8rem; margin-top:8px">Miscalibrated row-stochastic probability matrix</p>
+        <p class="hl" style="font-size:.75rem; margin-top:14px; letter-spacing:.05em">MEASURED BY: JSD · FROBENIUS</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px">
+    The two components address <strong>orthogonal failure modes</strong> — both are necessary<br>
+    <span style="font-size:.88em">High F1 ≠ low JSD &nbsp;·&nbsp; Low JSD ≠ high coverage &nbsp;·&nbsp; Three axes are independent</span>
+  </div>
+
+  <span class="snum">17 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     18 · SECTION — Conclusion
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s18" class="step slide-section"
+  data-x="7000" data-y="-1000" data-rotate="6" data-scale="1">
+  <div class="sec-num">05</div>
+  <h2>Conclusion</h2>
+  <p class="dim">Results · Guidelines · Future work</p>
+  <span class="snum">18 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     19 · SUMMARY
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s19" class="step slide-default glow-blue"
+  data-x="18200" data-y="0">
+
+  <h2>Summary of Results</h2>
+
+  <table style="margin-bottom:22px">
+    <thead><tr><th>RQ</th><th>Question</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge bbl">RQ1</span></td>
+        <td>Structural fidelity</td>
+        <td class="hl"><strong>F1 = 0.9125</strong> — exceeds 0.90 safety threshold</td>
+      </tr>
+      <tr>
+        <td><span class="badge bgr">RQ2</span></td>
+        <td>Fault-detection coverage</td>
+        <td class="pos"><strong>85.7%</strong> trans. coverage vs. 50% baseline (+35.7 pp)</td>
+      </tr>
+      <tr>
+        <td><span class="badge bpu">RQ3</span></td>
+        <td>Probabilistic calibration</td>
+        <td class="hl"><strong>JSD = 0.012</strong> — 93% divergence reduction</td>
+      </tr>
+      <tr>
+        <td><span class="badge bbl">RQ4</span></td>
+        <td>Component necessity</td>
+        <td>Symbolic loop → structure &nbsp;·&nbsp; Solver → calibration</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card gr" style="text-align:center; padding:18px">
+    <p style="font-size:.92rem; color:var(--lgreen)">
+      NeSy-MBST <strong>eliminates the manual modelling bottleneck</strong><br>
+      without compromising statistical rigour demanded by safety-critical CPS
+    </p>
+  </div>
+
+  <span class="snum">19 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     20 · ADOPTION GUIDELINES
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s20" class="step slide-default glow-green"
+  data-x="19600" data-y="0">
+
+  <h2>Adoption Guidelines</h2>
+
+  <ol style="font-size:.86rem; line-height:2">
+    <li><strong>Grammar-constrained oracles</strong> — restrict LLM output to <code>Yes/No/Unsure</code>; prevents hallucinated artefacts</li>
+    <li><strong>Symbolic verification loop before probability assignment</strong> — +35.7 pp transition coverage, 93% JSD reduction</li>
+    <li><strong>Convex optimization, not direct LLM output</strong> — JSD 0.157→0.012 via entropy-maximizing SLSQP</li>
+    <li><strong>Hierarchical multi-tier models</strong> — controls state-space explosion; preserves path-dependent fidelity</li>
+    <li><strong>Closed-loop telemetry recalibration</strong> — prevents model drift as usage patterns evolve</li>
+  </ol>
+
+  <div class="callout" style="margin-top:18px">
+    LLM augmentation of formal test-model generation should be <strong>standard engineering practice</strong>,<br>
+    provided: (1) grammar-constrained output + symbolic loop &nbsp;·&nbsp; (2) solver-assigned probabilities
+  </div>
+
+  <span class="snum">20 / 21</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     21 · CLOSING
+═══════════════════════════════════════════════════════════════════ -->
+<div id="s21" class="step slide-default"
+  data-x="21000" data-y="0"
+  style="background: radial-gradient(ellipse at 30% 50%, #071a10 0%, #060a10 70%); border-color: rgba(16,185,129,.2);">
+
+  <div class="cols">
+    <div class="w60">
+      <h2>Limitations &amp; Future Work</h2>
+      <div class="card or" style="margin-bottom:12px">
+        <h3 class="con" style="font-size:.88rem">Current scope</h3>
+        <ul style="font-size:.82rem">
+          <li>Two domains: AV CPS + e-commerce only</li>
+          <li>Models up to 42 states</li>
+          <li>Single-author ground-truth annotation</li>
+          <li>No direct fault-seeding measurement yet</li>
+        </ul>
+      </div>
+      <div class="card gr">
+        <h3 style="font-size:.88rem">Next steps</h3>
+        <ul style="font-size:.82rem">
+          <li>Fault-seeding experiments on industrial SUTs</li>
+          <li>Generalise: telecom, medical, ISO 26262</li>
+          <li>Multi-annotator inter-rater reliability</li>
+          <li>Three-valued oracle characterization at scale</li>
+        </ul>
+      </div>
+    </div>
+    <div class="w40" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center">
+      <div style="font-size:3rem; margin-bottom:16px">🙏</div>
+      <h3 style="font-size:1.4rem; color:var(--heading); margin-bottom:8px">Thank You</h3>
+      <p class="dim" style="margin-bottom:22px">Questions welcome</p>
+      <hr class="div" style="width:120px; margin:0 auto 20px">
+      <p style="font-size:.7rem; color:#334155; line-height:1.9">
+        Replication package:<br>
+        <code style="font-size:.68rem">github.com/nathangtg/llm-mbst-research</code><br>
+        <code style="font-size:.68rem; margin-top:4px; display:inline-block">python run_ablation.py</code>
+      </p>
+    </div>
+  </div>
+
+  <span class="snum">21 / 21</span>
+</div>
+
+</div><!-- #impress -->
+
+<!-- KaTeX -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<!-- Impress.js (local copy — no CDN dependency) -->
+<script src="impress.js"></script>
+
+<script>
+// Init KaTeX
+document.addEventListener('DOMContentLoaded', function () {
+  renderMathInElement(document.body, {
+    delimiters: [
+      { left: '\\[', right: '\\]', display: true  },
+      { left: '\\(', right: '\\)', display: false }
+    ],
+    throwOnError: false
+  });
+});
+
+// Init Impress — must happen after DOM ready
+document.addEventListener('DOMContentLoaded', function () {
+  var api = impress();
+  api.init();
+
+  // Fade hint on first navigation
+  var hint = document.getElementById('hint');
+  document.addEventListener('impress:stepenter', function () {
+    hint.style.opacity = '0';
+  }, { once: true });
+});
+</script>
+</body>
+</html>
