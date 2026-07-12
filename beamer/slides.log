@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.3.8)  12 JUL 2026 18:08
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.3.8)  12 JUL 2026 18:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1086,11 +1086,6 @@ LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <6> not available
 (Font)              Font shape `TU/lmss/m/sl' tried instead on input line 80.
 
-Overfull \hbox (24.22311pt too wide) in paragraph at lines 80--80
-[][] 
- []
-
-
 
 [3
 
@@ -1110,7 +1105,7 @@ LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <5> not available
 [5
 
 ]
-Overfull \hbox (25.45493pt too wide) in paragraph at lines 187--187
+Overfull \hbox (2.69263pt too wide) in paragraph at lines 187--187
 [][]  
  []
 
@@ -1241,7 +1236,7 @@ Package rerunfilecheck Info: File `slides.out' has not changed.
 Here is how much of TeX's memory you used:
  28177 strings out of 473832
  591228 string characters out of 5729482
- 982457 words of memory out of 5000000
+ 982511 words of memory out of 5000000
  50666 multiletter control sequences out of 15000+600000
  566663 words of font info for 91 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191

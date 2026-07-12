@@ -60,9 +60,9 @@
         \item Natural-language requirements $\to$ verified state machines: \con{no automated path}
       \end{itemize}
     \column{0.42\textwidth}
-      \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=2.4cm, scale=0.9, transform shape]
-        \tikzstyle{state}=[circle, draw, minimum size=1.0cm, inner sep=0pt, font=\small]
-        \tikzstyle{terminal}=[rectangle, rounded corners, draw, minimum size=0.7cm, inner sep=3pt, font=\small]
+      \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=1.8cm, scale=0.78, transform shape]
+        \tikzstyle{state}=[circle, draw, minimum size=0.9cm, inner sep=0pt, font=\small]
+        \tikzstyle{terminal}=[rectangle, rounded corners, draw, minimum size=0.6cm, inner sep=2pt, font=\small]
         \node[terminal]                (begin) {Begin};
         \node[state, right of=begin]   (A)     {$s_1$};
         \node[state, right of=A]       (B)     {$s_2$};
@@ -148,30 +148,30 @@
       \begin{tikzpicture}[
           >=latex, font=\scriptsize,
           engine/.style={rectangle, draw=blue!60!black, rounded corners=2pt,
-              fill=blue!7, minimum width=2.6cm, minimum height=0.8cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=blue!7, minimum width=2.4cm, minimum height=0.8cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           oracle/.style={rectangle, draw=green!60!black, rounded corners=2pt,
-              fill=green!7, minimum width=2.6cm, minimum height=0.8cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=green!7, minimum width=2.4cm, minimum height=0.8cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           sut/.style={rectangle, draw=red!60!black, rounded corners=2pt,
-              fill=red!7, minimum width=2.6cm, minimum height=0.8cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=red!7, minimum width=2.4cm, minimum height=0.8cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           topo/.style={rectangle, draw=yellow!70!black, rounded corners=2pt,
-              fill=yellow!12, minimum width=2.6cm, minimum height=0.7cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=yellow!12, minimum width=2.4cm, minimum height=0.7cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           solver/.style={rectangle, draw=orange!70!black, rounded corners=2pt,
-              fill=orange!8, minimum width=2.6cm, minimum height=0.8cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=orange!8, minimum width=2.4cm, minimum height=0.8cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           outnode/.style={rectangle, draw=violet!60!black, rounded corners=2pt,
-              fill=violet!7, minimum width=2.6cm, minimum height=0.8cm,
-              text width=2.4cm, align=center, line width=0.6pt},
+              fill=violet!7, minimum width=2.4cm, minimum height=0.8cm,
+              text width=2.2cm, align=center, line width=0.6pt},
           arr/.style={->, thick},
           darr/.style={->, thick, dashed},
           lbl/.style={font=\tiny, fill=white, inner sep=0.5pt}
       ]
       \node[engine]  (ale)    at (0,   0)    {Active Learning\\{\tiny ($L^*$ Algorithm)}};
-      \node[oracle]  (oracle) at (3.8, 0)    {Grammar-Constr.\\LLM Oracle};
-      \node[sut]     (sut)    at (3.8,-1.9)  {SUT Execution\\Validation};
+      \node[oracle]  (oracle) at (3.2, 0)    {Grammar-Constr.\\LLM Oracle};
+      \node[sut]     (sut)    at (3.2,-1.9)  {SUT Execution\\Validation};
       \node[topo]    (topo)   at (0,  -1.9)  {Verified State\\Topology};
       \node[solver]  (solver) at (0,  -3.5)  {Symbolic Constraint\\Solver};
       \node[outnode] (out)    at (0,  -5.0)  {Calibrated Markov\\Model};
