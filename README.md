@@ -5,7 +5,6 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![IEEE](https://img.shields.io/badge/venue-IEEE_submission-blue.svg)]()
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)]()
 
 **Author:** Nathan G.<sup>1,2</sup> 
@@ -14,7 +13,7 @@
 <sup>2</sup> Mercedes-Benz Tech Innovation
 
 **Contributors:** 
-*   **Proofreading & Review:** Jordan Chay, Jaeden Ting YiYong, Wai Phyo Hein
+*   **Proofreading:** Jordan Chay, Jaeden Ting YiYong, Wai Phyo Hein
 ---
 
 ## Overview
@@ -325,7 +324,6 @@ The symbolic feasibility loop is the primary driver of structural correctness an
   title   = {The Machine Proposes. The Proof Disposes.: Neuro-Symbolic Synthesis
              of Formally Verified {Markov} Usage Models from Natural Language
              Requirements},
-  journal = {IEEE Transactions on Software Engineering},
   year    = {2026},
   note    = {Under review. Available: https://github.com/nathangtg/nesy-mbst-framework}
 }
