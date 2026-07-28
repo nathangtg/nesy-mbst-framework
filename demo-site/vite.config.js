@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/nesy-mbst-framework/',
+  base: '/llm-mbst-research/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
