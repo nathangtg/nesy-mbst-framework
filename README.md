@@ -10,7 +10,6 @@
 **Author:** Nathan G.<sup>1,2</sup> 
 
 <sup>1</sup> School of Computing and Artificial Intelligence, Sunway University, Subang Jaya, Malaysia  
-<sup>2</sup> Mercedes-Benz Tech Innovation
 
 **Contributors:** 
 *   **Proofreading:** Jordan Chay, Jaeden Ting YiYong, Wai Phyo Hein

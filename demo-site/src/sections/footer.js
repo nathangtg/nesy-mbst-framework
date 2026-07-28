@@ -10,7 +10,7 @@ export function renderFooter() {
             Nathan Aldyth Prananta G.
           </p>
           <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Sunway University &middot; Mercedes-Benz Tech Innovation &middot; 2026
+            Sunway University &middot; 2026
           </p>
         </div>
 
