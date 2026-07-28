@@ -325,7 +325,7 @@ The symbolic feasibility loop is the primary driver of structural correctness an
              of Formally Verified {Markov} Usage Models from Natural Language
              Requirements},
   year    = {2026},
-  note    = {Under review. Available: https://github.com/nathangtg/nesy-mbst-framework}
+  note    = {Under review. Available: https://github.com/nathangtg/llm-mbst-research}
 }
 ```
 
