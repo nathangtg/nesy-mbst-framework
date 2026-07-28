@@ -65,3 +65,4 @@ output/research_figures/
 # Misc
 *.orig
 *.rej
+latex/*
