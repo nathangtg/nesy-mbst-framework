@@ -5,7 +5,7 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)]()
+[![DOI](https://img.shields.io/badge/DOI-10.21203%2Frs.3.rs--10481051%2Fv1-blue.svg)](https://doi.org/10.21203/rs.3.rs-10481051/v1)
 
 **Author:** Nathan G.<sup>1,2</sup> 
 
